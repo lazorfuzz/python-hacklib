@@ -1,5 +1,5 @@
 # hacklib
-Toolkit for hacking enthusiasts using Python.<br>
+##### Toolkit for hacking enthusiasts using Python.<br>
 
 hacklib is an all-in-one module for hacking enthusiasts. It is currently in its barebones stages.
 
