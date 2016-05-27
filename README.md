@@ -21,7 +21,7 @@ ps = hacklib.PortScanner()
 ps.scan(hacklib.getIP('google.com'))
 ```
 -
-Bonus "Security Cam Hack":
+Bonus "Security Cam Hack" (Not really):
 
 ```python
 import hacklib
