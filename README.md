@@ -3,8 +3,8 @@
 [![Python 2.6|2.7](https://img.shields.io/badge/python-2.6|2.7-yellow.svg)](https://www.python.org/)
 ##### Toolkit for hacking enthusiasts using Python.
 hacklib is a Python module for hacking enthusiasts. It is currently in its barebones stages.
--
-#### Examples of Usage:
+
+#### Examples of Usage
 -
 Multi-threaded Denial of Service (DOS) Stress-Testing:
 ```python
