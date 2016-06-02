@@ -23,7 +23,7 @@ ps.scan(hacklib.getIP('yourwebsite.com'))
 
 #After a scan, open ports are saved within ps for reference
 if ps.portOpen(80):
-    hacklib.send(getIP('yourwebsite.com'), 80, 'GET HTTP/1.1 \r\n')
+    hacklib.send(hacklib.getIP('yourwebsite.com'), 80, 'GET HTTP/1.1 \r\n')
 ```
 -
 Bonus "Security Cam Hack" (Not really):
