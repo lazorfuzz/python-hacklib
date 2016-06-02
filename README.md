@@ -16,14 +16,15 @@ dos.launch('yourwebsite.com', duration=30, threads=50)
 -
 Port Scanning:
 ```python
-import hacklib
+from hacklib import *
 
-ps = hacklib.PortScanner()
-ps.scan(hacklib.getIP('yourwebsite.com'))
+ps = PortScanner()
+ps.scan(getIP('yourwebsite.com'))
 
-#After a scan, open ports are saved within ps for reference
+# After a scan, open ports are saved within ps for reference
 if ps.portOpen(80):
-    hacklib.send(hacklib.getIP('yourwebsite.com'), 80, 'GET HTTP/1.1 \r\n')
+    # Establishes a TCP stream and sends a message
+    send(getIP('yourwebsite.com'), 80, message='GET HTTP/1.1 \r\n')
 ```
 -
 Bonus "Security Cam Hack" (Not really):
