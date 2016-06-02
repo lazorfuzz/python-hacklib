@@ -108,9 +108,9 @@ class PortScanner:
             con = s.connect((self.IP,port))
             response = s.recv(1024)
             self.openlist.append(port)
-            if verbose:
+            if self.verbose:
                 with self.print_lock:
-                    print 'Port', port, + ':'
+                    print 'Port', str(port) + ':'
                     print response
             s.close()
 
@@ -119,11 +119,12 @@ class PortScanner:
             if port in httplist:
                 try:
                     s.send('GET HTTP/1.1 \r\n')
+                    s.send("Host: " + self.IP + "\r\n\r\n")
                     response = s.recv(1024)
                     self.openlist.append(port)
-                    if verbose:
+                    if self.verbose:
                         with self.print_lock:
-                            print 'Port', port + ':'
+                            print 'Port', str(port) + ':'
                             print response
                     s.close()
                 except: pass
@@ -168,4 +169,3 @@ def send(IP, port, message):
     response = s.recv(1024)
     s.close()
     return response
-
