@@ -27,11 +27,16 @@ if ps.portOpen(80):
     send(getIP('yourwebsite.com'), 80, message='GET HTTP/1.1 \r\n')
 ```
 -
-Bonus "Security Cam Hack" (Not really):
+Universal Login for almost all HTTP/HTTPS login pages:
 
 ```python
 import hacklib
 
-camera = hacklib.CamHacker(auth_key='majorkey')
-camera.hack()
+# AuthClient uses the mechanize module for form-based logins. 
+ac = hacklib.AuthClient()
+# Attempts to login and return the HTML of the resulting page.
+# Returns False if login fails on HTML Basic Authentication
+htmldata = ac.login('http://yourwebsite.com', 'username', 'password')
+if 'incorrect' not in htmldata:
+    print 'Login Success'
 ```
