@@ -23,20 +23,23 @@ ps.scan(getIP('yourwebsite.com'))
 
 # After a scan, open ports are saved within ps for reference
 if ps.portOpen(80):
-    # Establishes a TCP stream and sends a message
+    # Establish a TCP stream and sends a message
     send(getIP('yourwebsite.com'), 80, message='GET HTTP/1.1 \r\n')
 ```
 -
-Universal Login for almost all HTTP/HTTPS login pages:
+Universal Login for almost all HTTP/HTTPS form-based logins and HTTP Basic Authentication logins:
 
 ```python
 import hacklib
 
-# AuthClient uses the mechanize module for form-based logins. 
 ac = hacklib.AuthClient()
-# Attempts to login and return the HTML of the resulting page.
-# Returns False if login fails on HTML Basic Authentication
+# AuthClient uses the mechanize module for form-based logins
+
+# Attempts to login and return the HTML of the resulting page
+# Returns False if login fails using HTML Basic Authentication
 htmldata = ac.login('http://yourwebsite.com', 'username', 'password')
+
+# For form-based logins, returns HTML whether login works or not.
 if 'incorrect' not in htmldata:
     print 'Login Success'
 ```
