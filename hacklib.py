@@ -56,7 +56,6 @@ class AuthClient:
             data = urllib2.urlopen(self.url)
             return 'FORM'
         except Exception, e:
-            print str(e)
             if 'error 401' in str(e).lower():
                 return 'BA'
             if 'timed out' in str(e).lower():
@@ -66,7 +65,7 @@ class AuthClient:
         try:
             import mechanize
         except:
-            raise Exception('Please install mechanize module before continuing. (pip install mechanize)')
+            raise Exception('Please install mechanize module before continuing.')
         # Sets up common input names/ids and creates instance of mechanize.Browser()
         userfields = ['user', 'username', 'usr', 'email', 'name', 'login', 'userid', 'userid-input', 'player']
         passfields = ['pass', 'password', 'passwd', 'pw']
@@ -198,9 +197,9 @@ class PortScanner:
                     print 'Port', str(port) + ':'
                     print response
             s.close()
-        # If the connection fails, tries to establish HTTP connection
+        # If the connection fails, tries to establish HTTP connection if port is a common HTTP port
         except Exception, e:
-            httplist = [80, 443, 1900, 2082, 2083, 8080, 8443]
+            httplist = [80, 81, 443, 1900, 2082, 2083, 8080, 8443]
             if port in httplist:
                 try:
                     s.send('GET HTTP/1.1 \r\n')
@@ -249,10 +248,21 @@ def getIP(host):
     return socket.gethostbyname(host)
 
 def send(IP, port, message, keepalive = False):
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    connection = s.connect((IP, port))
-    s.send(message)
-    response = s.recv(1024)
+    '''Sends a TCP message. If keepalive is true, use sock.close() to clean it manually.
+    '''
+    if keepalive:
+        global sock
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.connect((IP, port))
+    sock.send(message)
+    response = sock.recv(2048)
     if not keepalive:
-        s.close()
+        sock.close()
     return response
+
+def topPasswords(amount):
+    '''Get up to 1,000,000 most common passwords.
+    '''
+    url = 'https://raw.githubusercontent.com/danielmiessler/SecLists/master/Passwords/10_million_password_list_top_100000.txt'
+    passlist = urllib2.urlopen(url).read().split('\n')
+    return passlist[:amount]
