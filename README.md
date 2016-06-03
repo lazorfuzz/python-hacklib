@@ -20,6 +20,7 @@ from hacklib import *
 
 ps = PortScanner()
 ps.scan(getIP('yourwebsite.com'))
+# By default scans the first 1024 ports with 1 second timeout. Use ps.scan(IP, port_range=n, timeout=i) to change default
 
 # After a scan, open ports are saved within ps for reference
 if ps.portOpen(80):
@@ -36,8 +37,9 @@ ac = hacklib.AuthClient()
 # AuthClient uses the mechanize module for form-based logins
 
 # Attempts to login and return the HTML of the resulting page
+# Returns False if resulting page has the same URL as the login page
 # Returns False if login fails using HTML Basic Authentication
-htmldata = ac.login('http://yourwebsite.com', 'username', 'password')
+htmldata = ac.login('http://yourwebsite.com/login', 'username', 'password')
 
 # For form-based logins, returns HTML whether login works or not.
 if 'incorrect' not in htmldata:
