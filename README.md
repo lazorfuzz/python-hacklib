@@ -11,7 +11,7 @@ Multi-threaded Denial of Service (DOS) Stress-Testing:
 import hacklib
 
 dos = hacklib.DOSer()
-dos.launch('yourwebsite.com', duration=30, threads=50)
+dos.launch('http://yourwebsite.com', duration=30, threads=50)
 ```
 -
 Port Scanning:
@@ -38,7 +38,7 @@ ac = hacklib.AuthClient()
 
 # Attempts to login and return the HTML of the resulting page
 # Returns False if resulting page has the same URL as the login page
-# Returns False if login fails using HTML Basic Authentication
+# Returns False if login fails using HTTP Basic Authentication
 htmldata = ac.login('http://yourwebsite.com/login', 'username', 'password')
 
 # For form-based logins, returns HTML whether login works or not.
