@@ -59,7 +59,7 @@ passwords = topPasswords(100)
 
 for p in passwords:
     htmldata = ac.login('http://yourwebsite.com/login', 'admin', p)
-    if 'try again' not in htmldata:
+    if htmldata and 'try again' not in htmldata:
         print 'Password is', p
         break
 ```
