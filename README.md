@@ -66,9 +66,8 @@ for p in passwords:
 -
 #### Combining the Tools
 -
-Misfortune Cookie Exploit:
+Misfortune Cookie Exploit (CVE-2014-9222):
 ```python
-# CVE-2014-9222
 >>> import hacklib
 
 # Discovery
