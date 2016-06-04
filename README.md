@@ -28,7 +28,7 @@ if ps.portOpen(80):
     send(getIP('yourwebsite.com'), 80, message='GET HTTP/1.1 \r\n')
 ```
 
-Misfortune Cookie Exploit (CVE-2014-9222):
+Misfortune Cookie Exploit (CVE-2014-9222) using PortScanner:
 ```python
 >>> import hacklib
 
