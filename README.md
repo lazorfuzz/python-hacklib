@@ -64,6 +64,8 @@ for p in passwords:
     # For HTTP Basic Authentication logins, simply use 'if htmldata:'
 ```
 -
+#### Combining the Tools
+-
 Misfortune Cookie Exploit:
 ```python
 # CVE-2014-9222
