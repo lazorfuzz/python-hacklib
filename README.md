@@ -11,6 +11,7 @@ Multi-threaded Denial of Service (DOS) Stress-Testing:
 import hacklib
 
 dos = hacklib.DOSer()
+# Create 50 threads to send GET requests for 30 seconds
 dos.launch('http://yourwebsite.com', duration=30, threads=50)
 ```
 -
