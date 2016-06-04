@@ -19,6 +19,36 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.'''
 import socket, httplib, threading, time, urllib2
 from queue import Queue
 
+class FTPAuth:
+    '''FTP login and command handler.
+    Commands:
+                    login() Args: username, password
+                    send() Args: message
+    '''
+
+    def __init__(self, IP, port=21):
+        self.IP = IP
+        self.port = port
+        self.username = ''
+        self.password = ''
+        self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.s.settimeout(8)
+        self.s.connect((self.IP, self.port))
+        self.s.recv(1024)
+
+    def send(self, message):
+        self.s.send(message)
+        return self.s.recv(2048)
+
+    def login(self, username, password):
+        self.send('USER ' + username + '\r\n')
+        response = self.send('PASS ' + password + '\r\n')
+        if '230' in response:
+            return
+        else:
+            raise Exception(response)
+        
+
 class CamHacker:
     '''Summons a security camera hacker from the cloud.
     '''
@@ -43,6 +73,8 @@ class CamHacker:
 
 class AuthClient:
     '''Universal login tool for most login pages as well as HTTP Basic Authentication.
+    Commands:
+                    login() Args: url, username, password
     '''
 
     def __init__(self):
@@ -68,7 +100,7 @@ class AuthClient:
             raise Exception('Please install mechanize module before continuing.')
         # Sets up common input names/ids and creates instance of mechanize.Browser()
         userfields = ['user', 'username', 'usr', 'email', 'name', 'login', 'userid', 'userid-input', 'player']
-        passfields = ['pass', 'password', 'passwd', 'pw']
+        passfields = ['pass', 'password', 'passwd', 'pw', 'pwd']
         br = mechanize.Browser()
         br.set_handle_robots(False)
         br.set_handle_refresh(False)
@@ -81,8 +113,8 @@ class AuthClient:
         password_control = ''
         # Locates username and password controls, and submits login info
         for control in br.form.controls:
-            if control.name in userfields or control.id in userfields: username_control = control
-            if control.name in passfields or control.id in passfields: password_control = control
+            if control.name.lower() in userfields or control.id.lower() in userfields: username_control = control
+            if control.name.lower() in passfields or control.id.lower() in passfields: password_control = control
         username_control.value = self.username
         password_control.value = self.password
         response = br.submit()
@@ -125,6 +157,9 @@ class AuthClient:
 
 class DOSer:
     '''Hits a host with GET requests on default port 80 from multiple threads.
+    Commands:
+                    launch() Args: host, duration, threads(default 1), port(default 80),
+                    payload(default crocodile)
     '''
 
     def __init__(self):
@@ -176,7 +211,9 @@ class DOSer:
         return
 
 class PortScanner:
-    '''Scan an IP address using scan(host) with default port range of 1025
+    '''Scan an IP address using scan(host) with default port range 1-1024.
+    Commands:
+                    scan() Args: IP, port_range(default 1024), timeout(default 1), verbose(default True)
     '''
 
     def __init__(self):
@@ -256,7 +293,7 @@ def getIP(host):
     return socket.gethostbyname(host)
 
 def send(IP, port, message, keepalive = False):
-    '''Sends a TCP message. If keepalive is true, use sock.close() to clean it manually.
+    '''Sends a TCP message. If keepalive is true, use hacklib.sock to handle socket.
     '''
     if keepalive:
         global sock
