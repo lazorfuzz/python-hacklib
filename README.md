@@ -12,7 +12,7 @@ import hacklib
 
 dos = hacklib.DOSer()
 # Create 50 threads to send GET requests for 30 seconds
-dos.launch('http://yourwebsite.com', duration=30, threads=50)
+dos.launch('127.0.0.1', duration=30, threads=50)
 ```
 -
 Port Scanning:
@@ -88,4 +88,14 @@ for p in passwords:
         print 'Password is', p
         break
     # For HTTP Basic Authentication logins, simply use 'if htmldata:'
+```
+-
+FTP Authentication:
+```python
+import hacklib
+ftp = hacklib.FTPAuth('127.0.0.1', 21)
+try:
+    ftp.login('username', 'password')
+except:
+    print 'Login failed.'
 ```
