@@ -63,7 +63,6 @@ Universal Login for almost all HTTP/HTTPS form-based logins and HTTP Basic Authe
 import hacklib
 
 ac = hacklib.AuthClient()
-
 htmldata = ac.login('http://yourwebsite.com/login', 'username', 'password')
 
 # For form-based logins, returns HTML whether login works or not.
