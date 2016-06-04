@@ -63,7 +63,7 @@ for p in passwords:
         break
     # For HTTP Basic Authentication logins, simply use 'if htmldata:'
 ```
--
+
 #### Combining the Tools
 -
 Misfortune Cookie Exploit:
