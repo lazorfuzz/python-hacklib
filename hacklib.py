@@ -113,11 +113,19 @@ class AuthClient:
         br.form = list(br.forms())[0]
         username_control = ''
         password_control = ''
-        # Locates username and password controls, and submits login info
+        # Locates username and password input, and submits login info
         for control in br.form.controls:
             if control.name and control.name.lower() in userfields or control.id and control.id.lower() in userfields: username_control = control
             if control.name and control.name.lower() in passfields or control.id and control.id.lower() in passfields: password_control = control
         username_control.value = self.username
+        try: password_control.value = self.password
+        except:
+            # Detected a username input but not a password input.
+            # Submits form with username and attempts to detect password input in resulting page
+            response = br.submit()
+            br.form = list(br.forms())[0]
+            for control in br.form.controls:
+                if control.name and control.name.lower() in passfields or control.id and control.id.lower() in passfields: password_control = control
         password_control.value = self.password
         response = br.submit()
         # Returns response if the URL is changed. Assumes login failure if URL is the same
