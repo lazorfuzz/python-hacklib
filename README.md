@@ -63,10 +63,11 @@ Universal Login for almost all HTTP/HTTPS form-based logins and HTTP Basic Authe
 import hacklib
 
 ac = hacklib.AuthClient()
+# Logging into a gmail account
 htmldata = ac.login('https://gmail.com', 'email', 'password')
 
-# For form-based logins, returns HTML whether login works or not.
 # Returns False if resulting page has the same URL as the login page
+# Otherwise, returns HTML whether login works or not.
 if htmldata and 'Inbox' in htmldata:
     print 'Login Success'
 
