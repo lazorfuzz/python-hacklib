@@ -115,8 +115,8 @@ class AuthClient:
         password_control = ''
         # Locates username and password controls, and submits login info
         for control in br.form.controls:
-            if control.name in userfields or control.id in userfields: username_control = control
-            if control.name in passfields or control.id in passfields: password_control = control
+            if control.name and control.name.lower() in userfields or control.id and control.id.lower() in userfields: username_control = control
+            if control.name and control.name.lower() in passfields or control.id and control.id.lower() in passfields: password_control = control
         username_control.value = self.username
         password_control.value = self.password
         response = br.submit()
