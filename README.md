@@ -63,16 +63,16 @@ Universal Login for almost all HTTP/HTTPS form-based logins and HTTP Basic Authe
 import hacklib
 
 ac = hacklib.AuthClient()
-htmldata = ac.login('http://yourwebsite.com/login', 'username', 'password')
+htmldata = ac.login('https://gmail.com', 'email', 'password')
 
 # For form-based logins, returns HTML whether login works or not.
 # Returns False if resulting page has the same URL as the login page
-if htmldata and 'try again' not in htmldata.lower():
+if htmldata and 'Inbox' in htmldata:
     print 'Login Success'
 
 # Returns False if login fails using HTTP Basic Authentication
-if htmldata:
-    print 'Login Success'
+#if htmldata:
+#    print 'Login Success'
 ```
 Simple Dictionary Attack using AuthClient:
 ```python
