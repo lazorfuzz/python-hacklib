@@ -1,4 +1,6 @@
-'''Copyright (c) 2016 Leon Li (leon@apolyse.com)
+'''The MIT License (MIT)
+
+Copyright (c) 2016 Leon Li (leon@apolyse.com)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
 associated documentation files (the "Software"), to deal in the Software without restriction, including
@@ -97,7 +99,7 @@ class AuthClient:
         try:
             import mechanize
         except:
-            raise Exception('Please install mechanize module before continuing.')
+            raise Exception('Please install the mechanize module before continuing.')
         # Sets up common input names/ids and creates instance of mechanize.Browser()
         userfields = ['user', 'username', 'usr', 'email', 'name', 'login', 'userid', 'userid-input', 'player']
         passfields = ['pass', 'password', 'passwd', 'pw', 'pwd']
@@ -113,8 +115,8 @@ class AuthClient:
         password_control = ''
         # Locates username and password controls, and submits login info
         for control in br.form.controls:
-            if control.name.lower() in userfields or control.id.lower() in userfields: username_control = control
-            if control.name.lower() in passfields or control.id.lower() in passfields: password_control = control
+            if control.name in userfields or control.id in userfields: username_control = control
+            if control.name in passfields or control.id in passfields: password_control = control
         username_control.value = self.username
         password_control.value = self.password
         response = br.submit()
@@ -291,6 +293,7 @@ Accept-Encoding: gzip, deflate''' + '\r\n\r\n'
         
 def getIP(host):
     return socket.gethostbyname(host)
+
 
 def send(IP, port, message, keepalive = False):
     '''Sends a TCP message. If keepalive is true, use hacklib.sock to handle socket.
