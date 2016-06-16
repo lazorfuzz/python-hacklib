@@ -21,7 +21,7 @@ from hacklib import *
 
 ps = PortScanner()
 ps.scan(getIP('yourwebsite.com'))
-# By default scans the first 1024 ports with 1 second timeout. Use ps.scan(IP, port_range=n, timeout=i) to change default
+# By default scans the first 1024 ports. Use ps.scan(IP, port_range=(n1, n2), timeout=i) to change default
 
 # After a scan, open ports are saved within ps for reference
 if ps.portOpen(80):
@@ -35,7 +35,7 @@ Misfortune Cookie Exploit (CVE-2014-9222) using PortScanner:
 
 # Discovery
 >>> ps = hacklib.PortScanner()
->>> ps.scan('192.168.1.1', 81)
+>>> ps.scan('192.168.1.1', (80, 81))
 Port 80:
 HTTP/1.1 404 Not Found
 Content-Type: text/html
@@ -66,12 +66,12 @@ ac = hacklib.AuthClient()
 # Logging into a gmail account
 htmldata = ac.login('https://gmail.com', 'email', 'password')
 
-# Returns False if resulting page has the same URL as the login page
-# Otherwise, returns HTML whether login works or not.
+# Returns HTML whether login works or not.
+# If resulting URL is the same, assumes failure and returns False.
 if htmldata and 'Inbox' in htmldata:
     print 'Login Success'
 
-# Returns False if login fails using HTTP Basic Authentication
+# For logins using HTTP Basic Auth, just check boolean:
 #if htmldata:
 #    print 'Login Success'
 ```
@@ -88,7 +88,6 @@ for p in passwords:
     if htmldata and 'welcome' in htmldata.lower():
         print 'Password is', p
         break
-    # For HTTP Basic Authentication logins, simply use 'if htmldata:'
 ```
 -
 FTP Authentication:
