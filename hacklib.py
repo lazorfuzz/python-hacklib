@@ -280,7 +280,7 @@ Accept-Encoding: gzip, deflate''' + '\r\n\r\n'
             self._portscan(self.worker)
             self.q.task_done()
 
-    def scan(self, IP, port_range = 1025, timeout = 1, verbose = True):
+    def scan(self, IP, port_range = (1, 1025), timeout = 1, verbose = True):
         '''Scans ports of an IP address. Use getIP() to find IP address of host.
         '''
         self.openlist = []
@@ -294,7 +294,7 @@ Accept-Encoding: gzip, deflate''' + '\r\n\r\n'
             t.daemon = True
             t.start()
         # Adds workers to queue
-        for worker in range(1, port_range):
+        for worker in range(port_range[0], port_range[1]):
             self.q.put(worker)
 
         self.q.join()
@@ -302,14 +302,16 @@ Accept-Encoding: gzip, deflate''' + '\r\n\r\n'
 def getIP(host):
     return socket.gethostbyname(host)
 
-
+sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 def send(IP, port, message, keepalive = False):
-    '''Sends a TCP message. If keepalive is true, use hacklib.sock to handle socket.
+    '''Creates new socket and sends a TCP message. If keepalive is true, use hacklib.sock
+    to handle socket and hacklib.sock.close() when finished.
     '''
     if keepalive:
         global sock
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.connect((IP, port))
+    else:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.connect((IP, port))
     sock.send(message)
     response = sock.recv(2048)
     if not keepalive:
