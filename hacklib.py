@@ -50,29 +50,6 @@ class FTPAuth:
         else:
             raise Exception(response)
         
-
-class CamHacker:
-    '''Summons a security camera hacker from the cloud.
-    '''
-
-    def __init__(self, auth_key):
-        self._repository = 'https://apolyse.com/hacklib/cams.php'
-        self.auth_key = auth_key
-
-    def _request(self, url):                 
-        return urllib2.urlopen(url + '?key=' + self.auth_key).read()
-
-    def hack(self):
-        '''Returns cam URL and login details.
-        '''
-        data = self._request(self._repository)
-        if '|' not in data:
-            print 'Invalid key.'
-            return
-        data_list = data.split('|')
-        print 'Security Cam URL: ' + data_list[0] + '\n' + 'Username: ' + data_list[1] + '\n' + 'Password: ' + data_list[2]
-        return
-
 class AuthClient:
     '''Universal login tool for most login pages as well as HTTP Basic Authentication.
     Commands:
