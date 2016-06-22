@@ -24,11 +24,9 @@ ac = hacklib.AuthClient()
 # Logging into a gmail account
 htmldata = ac.login('https://gmail.com', 'email', 'password')
 
-# Returns HTML whether login works or not.
-try:
-    if 'Inbox' in htmldata: print 'Login Success.'
-    else: print 'Login Failed.'
-except: print 'Couldn\'t even connect. :('
+# Check for a string in the resulting page
+if 'Inbox' in htmldata: print 'Login Success.'
+else: print 'Login Failed.'
 
 # For logins using HTTP Basic Auth:
 try: 
@@ -106,19 +104,17 @@ Socks4/5 proxy scraping and tunneling
 ```python
 >>> import hacklib
 >>> import urllib2
-# Scrape recently added Socks proxies from the internet
->>> proxylist = hacklib.getProxies()
+>>> proxylist = hacklib.getProxies() # scrape recently added socks proxies from the internet
 >>> proxy = hacklib.Proxy()
-# Automatically find and connect to a working proxy in proxylist
->>> proxy.connect(proxylist)
+>>> proxy.connect(proxylist) # automatically find and connect to a working proxy in proxylist
 >>> proxy.IP
 u'41.203.214.58'
 >>> proxy.port
 65000
 >>> proxy.country
 u'KE'
-# All Python network activity across all modules are routed through the proxy
->>> urllib2.urlopen('http://icanhazip.com/').read()
+# All Python network activity across all modules are routed through the proxy:
+>>> urllib2.urlopen('http://icanhazip.com/').read() 
 '41.203.214.58\n'
 # Notes: Only network activity via Python are masked by the proxy.
 # Network activity on other programs such as your webbrowser remain unmasked.
