@@ -35,7 +35,7 @@ try:
     htmldata = ac.login('http://somewebsite.com', 'admin', 'password')
 except: pass #login failed
 ```
-Simple Dictionary Attack using AuthClient:
+Simple dictionary attack using AuthClient:
 ```python
 import hacklib
 
