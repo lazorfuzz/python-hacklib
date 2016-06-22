@@ -122,6 +122,6 @@ u'KE'
 '41.203.214.58\n'
 # Notes: Only network activity via Python are masked by the proxy.
 # Network activity on other programs such as your webbrowser remain unmasked.
-# Filtering proxies by country and type:
+# To filter proxies by country and type:
 # proxylist = hacklib.getProxies(country_filter = ('RU', 'CA', 'SE'), proxy_type='Socks5')
 ```
