@@ -19,9 +19,9 @@ CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFT
 OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.'''
 
 import socket, httplib, threading, time, urllib2
-from multiprocessing import Queue
+from Queue import Queue
 
-class FTPAuth:
+class FTPAuth(object):
     '''FTP login and command handler.
     Commands:
                     login() Args: username, password
@@ -50,7 +50,7 @@ class FTPAuth:
         else:
             raise Exception(response)
         
-class AuthClient:
+class AuthClient(object):
     '''Universal login tool for most login pages as well as HTTP Basic Authentication.
     Commands:
                     login() Args: url, username, password
@@ -109,7 +109,7 @@ class AuthClient:
         if response.geturl() != loginurl:
             return response.read()
         else:
-            return False
+            raise Exception('Login credentials incorrect.')
 
     def _login_BA(self):
         try:
@@ -120,11 +120,12 @@ class AuthClient:
             auth = urllib2.HTTPBasicAuthHandler(passmanager)
             opener = urllib2.build_opener(auth)
             response = opener.open(self.url, timeout=8)
+            data = response.read()
             response.close()
-            return True
+            return data
         except Exception, e:
             if 'Error 401' in str(e):
-                return False
+                raise Exception('Login credentials incorrect.')
             
     def login(self, url, username, password):
         self.url = url
@@ -136,12 +137,11 @@ class AuthClient:
             # attempts to login with BA method and return True
            return self._login_BA()
         if logintype == 'TO':
-            print 'Request timed out.'
-            return False
+            raise Exception('Request timed out.')
         if logintype == 'FORM':
             return self._login_mechanize()
 
-class DOSer:
+class DOSer(object):
     '''Hits a host with GET requests on default port 80 from multiple threads.
     Commands:
                     launch() Args: host, duration, threads(default 1), port(default 80),
@@ -196,7 +196,7 @@ class DOSer:
         self.q.join()
         return
 
-class PortScanner:
+class PortScanner(object):
     '''Scan an IP address using scan(host) with default port range 1-1024.
     Commands:
                     scan() Args: IP, port_range(default 1024), timeout(default 1), verbose(default True)
@@ -274,9 +274,113 @@ Accept-Encoding: gzip, deflate''' + '\r\n\r\n'
             self.q.put(worker)
 
         self.q.join()
-        
+
+class Proxy(object):
+    '''Can work in conjunction with getProxies() to tunnel all
+    network activity in the Python script through a Socks4/5 proxy.
+    Commands:
+                    set_auto() Args: getProxies(), timeout=10
+                    set_manual() Args: IP, port, proxy_type
+    '''
+    
+    def __init__(self):
+        self.IP = ''
+        self.port = ''
+        self.proxy_type = ''
+        self.country = ''
+        self._socksfile = urllib2.urlopen('https://raw.githubusercontent.com/Anorov/PySocks/master/socks.py').read()
+        global socks
+        # Dynamically import socks.py from the internet
+        socks = importFromString(self._socksfile, 'socks')
+
+    def set_auto(self, proxies, timeout=10):
+        for proxy in proxies:
+            if proxy[4] == 'Socks4':
+                self.proxy_type = socks.PROXY_TYPE_SOCKS4
+            else:
+                self.proxy_type = socks.PROXY_TYPE_SOCKS5
+            try:
+                # Sets the socket.socket class to the socks module's socksocket class
+                socks.setdefaultproxy(self.proxy_type, proxy[0], int(proxy[1]))
+                socket.socket = socks.socksocket
+                # Tests to see if the proxy can open a webpage
+                currentIP = urllib2.urlopen('http://icanhazip.com/', timeout = timeout).read().split()[0]
+                self.IP = proxy[0]
+                self.port = int(proxy[1])
+                self.country = proxy[2]
+                return
+            except: pass
+        raise Exception('Couldn\'t connect to any proxies.')
+
+    def set_manual(IP, port, proxy_type='Socks5'):
+        if proxy_type == 'Socks4':
+            self.proxy_type = socks.PROXY_TYPE_SOCKS4
+        else:
+            self.proxy_type = socks.PROXY_TYPE_SOCKS5
+        try:
+            socks.setdefaultproxy(self.proxy_type, IP, port)
+            socket.socket = socks.socksocket
+            currentIP = urllib2.urlopen('http://icanhazip.com/').read().split()[0]
+            self.IP = IP
+            self.port = port
+            return currentIP
+        except: raise Exception('Connection failed.')
+
+
+def importFromString(code, name):
+    """Import dynamically generated code as a module.
+    Args: code: a string, a file handle, or a compiled binary
+    name: the name of the module
+    """
+    import sys, imp
+    module = imp.new_module(name)
+    exec code in module.__dict__
+    return module
+
+
 def getIP(host):
     return socket.gethostbyname(host)
+
+def getProxies(country_filter = 'ALL', proxy_type = ('Socks4', 'Socks5')):
+    '''Gets list of recently tested Socks4/5 proxies.
+    Return format is as follows:
+    [IP, Port, Country Code, Country, Proxy Type, Anonymous, Yes/No, Last Checked]
+    Args: country_filter: Specify country codes within a tuple, e.g. ('US', 'MX')
+    proxy_type: Specify whic Socks version to use, e.g. 'Socks5'
+    '''
+    try: import mechanize
+    except: raise Exception('Please install the mechanize module before continuing.')
+    try: from bs4 import BeautifulSoup
+    except: raise Exception('Please install the beautifulsoup4 module before continuing.')
+    br = mechanize.Browser()
+    br.set_handle_robots(False)
+    br.addheaders = [('User-agent', 'googlebot')]
+    data = br.open('http://www.socks-proxy.net').read()
+    soup = BeautifulSoup(data, 'html.parser')
+    proxylist = []
+    table = soup.find('table')
+    tbody = table.find('tbody')
+    rows = tbody.find_all('tr')
+    for row in rows:
+        cols = row.find_all('td')
+        cols = [ele.text.strip() for ele in cols]
+        proxylist.append([ele for ele in cols if ele])
+    filteredlist = []
+    if not country_filter == 'ALL':
+        for proxy in proxylist:
+            if proxy[2] in country_filter:
+                filteredlist.append(proxy)
+        proxylist = filteredlist
+        filteredlist = []
+    if not proxy_type == ('Socks4', 'Socks5'):
+        for proxy in proxylist:
+            if not country_filter == 'ALL':
+                if proxy[4] in proxy_type and proxy[2] in country_filter:
+                    filteredlist.append(proxy)
+            else:
+                if proxy[4] in proxy_type: filteredlist.append(proxy)
+        proxylist = filteredlist
+    return proxylist
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 def send(IP, port, message, keepalive = False):
@@ -295,7 +399,7 @@ def send(IP, port, message, keepalive = False):
     return response
 
 def topPasswords(amount):
-    '''Get up to 100,000 most common passwords.
+    '''Get up to 1,000,000 most common passwords.
     '''
     url = 'https://raw.githubusercontent.com/danielmiessler/SecLists/master/Passwords/10_million_password_list_top_100000.txt'
     passlist = urllib2.urlopen(url).read().split('\n')
