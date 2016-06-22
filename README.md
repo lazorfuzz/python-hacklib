@@ -117,13 +117,11 @@ u'41.203.214.58'
 65000
 >>> proxy.country
 u'KE'
-# All Python network activity across all modules are routed through proxy
+# All Python network activity across all modules are routed through the proxy
 >>> urllib2.urlopen('http://icanhazip.com/').read()
 '41.203.214.58\n'
-# Notes: Only network activity via Python masked by the proxy.
-# Network activity on other programs remain unmasked.
-```
-Filter proxies by 
+# Notes: Only network activity via Python are masked by the proxy.
+# Network activity on other programs such as your webbrowser remain unmasked.
 # Filtering proxies by country and type:
-# proxylist = hacklib.getProxies(country_filter = ('RU', 'CA', 'SE'), proxy_type='Socks5'
+# proxylist = hacklib.getProxies(country_filter = ('RU', 'CA', 'SE'), proxy_type='Socks5')
 ```
