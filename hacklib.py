@@ -293,7 +293,7 @@ class Proxy(object):
         # Dynamically import socks.py from the internet
         socks = importFromString(self._socksfile, 'socks')
 
-    def set_auto(self, proxies, timeout=10):
+    def connect(self, proxies, timeout=10):
         for proxy in proxies:
             if proxy[4] == 'Socks4':
                 self.proxy_type = socks.PROXY_TYPE_SOCKS4
@@ -312,7 +312,7 @@ class Proxy(object):
             except: pass
         raise Exception('Couldn\'t connect to any proxies.')
 
-    def set_manual(IP, port, proxy_type='Socks5'):
+    def connect_manual(IP, port, proxy_type='Socks5'):
         if proxy_type == 'Socks4':
             self.proxy_type = socks.PROXY_TYPE_SOCKS4
         else:
