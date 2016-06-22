@@ -123,7 +123,6 @@ class AuthClient:
             response.close()
             return True
         except Exception, e:
-            print str(e)
             if 'Error 401' in str(e):
                 return False
             
