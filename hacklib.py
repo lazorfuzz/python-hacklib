@@ -296,7 +296,7 @@ def send(IP, port, message, keepalive = False):
     return response
 
 def topPasswords(amount):
-    '''Get up to 1,000,000 most common passwords.
+    '''Get up to 100,000 most common passwords.
     '''
     url = 'https://raw.githubusercontent.com/danielmiessler/SecLists/master/Passwords/10_million_password_list_top_100000.txt'
     passlist = urllib2.urlopen(url).read().split('\n')
