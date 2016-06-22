@@ -28,7 +28,7 @@ htmldata = ac.login('https://gmail.com', 'email', 'password')
 try:
     if 'Inbox' in htmldata: print 'Login Success.'
     else: print 'Login Failed.'
-except: print 'Couldn't even connect. :('
+except: print 'Couldn\'t even connect. :('
 
 # For logins using HTTP Basic Auth:
 try: 
