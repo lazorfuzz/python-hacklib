@@ -4,7 +4,15 @@
 ##### Toolkit for hacking enthusiasts using Python.
 hacklib is a Python module for hacking enthusiasts interested in network security. It is currently in active development.
 
-#### Examples of Usage
+-
+#### Installation
+To get hacklib, simply run in command line:
+```console
+pip install hacklib
+```
+
+-
+#### Usage Examples
 -
 Multi-threaded Denial of Service (DOS) stress-testing:
 ```python
