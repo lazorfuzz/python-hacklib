@@ -134,7 +134,7 @@ class AuthClient(object):
         # ascertain the type of login page given by url
         logintype = self. _get_login_type()
         if logintype == 'BA':
-            # attempts to login with BA method and return True
+            # attempts to login with BA method and return html
            return self._login_BA()
         if logintype == 'TO':
             raise Exception('Request timed out.')
@@ -279,8 +279,8 @@ class Proxy(object):
     '''Can work in conjunction with getProxies() to tunnel all
     network activity in the Python script through a Socks4/5 proxy.
     Commands:
-                    set_auto() Args: getProxies(), timeout=10
-                    set_manual() Args: IP, port, proxy_type
+                    connect() Args: getProxies(), timeout=10
+                    connect_manual() Args: IP, port, proxy_type
     '''
     
     def __init__(self):
@@ -405,3 +405,42 @@ def topPasswords(amount):
     passlist = urllib2.urlopen(url).read().split('\n')
     return passlist[:amount]
 
+def userInterface():
+    '''Start text-based interface for easier usage if hacklib isn't being used as a library.
+    '''
+    while True:
+        print 'Enter an IP address or URL for further options.'
+        print 'Or, enter "proxy" to connect to a proxy.'
+        cmd = raw_input('> ')
+        if '.' in cmd: # Checks for . to make sure it's an IP or URL
+            address = getIP(cmd)
+            print 'What would you like to do?'
+            print '1) PortScan'
+            print '2) DOS'
+            print '3) Send TCP message'
+            print '4) Attempt login'
+            cmd = getIP(raw_input('> '))
+        elif 'proxy' in cmd:
+            print 'Would you like to automatically find a proxy or input one manually?'
+            print 'Enter the number corresponding to your choice.'
+            print '1) Auto'
+            print '2) Manual'
+            cmd = raw_input('> ')
+            proxies = getProxies()
+            global proxy
+            proxy = Proxy()
+            if cmd == '1':
+                proxy.connect(getProxies())
+                print 'Your new IP address is ' + proxy.IP
+                print 'This proxy is located in ' + proxy.country
+            elif cmd == '2':
+                pr_address = raw_input('Proxy address > ')
+                pr_port = raw_input('Proxy port > ')
+                pr_type = raw_input('Enter "Socks4" or "Socks5" > ')
+                try: proxy.connect_manual(pr_address, pr_port, pr_type)
+                except: print 'Connection failed.'; pass
+                print 'Proxy connected.'
+                pass
+
+if __name__ == '__main__':
+    userInterface()
