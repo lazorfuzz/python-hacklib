@@ -10,7 +10,29 @@ To get hacklib, simply run in command line:
 ```console
 pip install hacklib
 ```
+hacklib also has a user interface. To use it, you can do one of the following:
 
+Download hacklib.py and run in console:
+```console
+python hacklib.py
+----------------------------------------------
+Hey. What can I do you for?
+
+
+Enter the number corresponding to your choice.
+
+1) Connect to a proxy
+2) Target an IP or URL
+3) Lan Scan
+4) Exit
+
+```
+Or if you got it using pip:
+
+```python
+import hacklib
+hacklib.userInterface()
+```
 -
 #### Usage Examples
 Multi-threaded Denial of Service (DOS) stress-testing:
