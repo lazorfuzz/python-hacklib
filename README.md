@@ -65,6 +65,10 @@ leon
 bash-3.2$ 
 # Sweet!
 ```
+In addition, you can also listen with netcat:
+```
+nc -l 9090
+```
 -
 Universal login client for almost all HTTP/HTTPS form-based logins and HTTP Basic Authentication logins:
 
