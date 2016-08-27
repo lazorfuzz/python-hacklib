@@ -34,6 +34,12 @@ import hacklib
 hacklib.userInterface()
 ```
 -
+#### Dependencies
+Not all classes have external dependencies, but just in case you can do the following:
+```python
+hacklib.installDependencies()
+```
+-
 #### Usage Examples
 Multi-threaded Denial of Service (DOS) stress-testing:
 ```python
