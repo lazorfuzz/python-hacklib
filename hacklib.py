@@ -69,7 +69,7 @@ exit
                 f.write(self.osx_payload)
             import subprocess
             subprocess.Popen(['chmod', '755', payload_path])
-            print 'Payload saved to ' + os.getcwd() + appname + '.app'
+            print 'Payload saved to ' + os.getcwd() + '/' + appname + '.app'
 
 class Server(object):
 
