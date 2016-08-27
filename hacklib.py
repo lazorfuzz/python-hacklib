@@ -76,7 +76,7 @@ class Server(object):
     def __init__(self, port):
         import socket
         self.port = port
-        self.address = ('localhost', port)
+        self.address = ('', port)
 
     def listen(self):
         import time
