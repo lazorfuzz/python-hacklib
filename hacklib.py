@@ -445,9 +445,9 @@ def getProxies(country_filter = 'ALL', proxy_type = ('Socks4', 'Socks5')):
     proxy_type: Specify whic Socks version to use, e.g. 'Socks5'
     '''
     try: import mechanize
-    except: raise MissingPackageException('Please install the mechanize module before continuing.')
+    except: raise MissingPackageException('Please install the mechanize module before continuing. Use hacklib.installDependencies()')
     try: from bs4 import BeautifulSoup
-    except: raise MissingPackageException('Please install the beautifulsoup4 module before continuing.')
+    except: raise MissingPackageException('Please install the beautifulsoup4 module before continuing. Use hacklib.installDependencies()')
     br = mechanize.Browser()
     br.set_handle_robots(False)
     br.addheaders = [('User-agent', 'googlebot')]
@@ -477,6 +477,18 @@ def getProxies(country_filter = 'ALL', proxy_type = ('Socks4', 'Socks5')):
                 if proxy[4] in proxy_type: filteredlist.append(proxy)
         proxylist = filteredlist
     return proxylist
+
+def installDependencies():
+    import subprocess
+    try:
+        mech = subprocess.check_output(['/usr/local/bin/pip', 'install', 'mechanize'])
+        if 'successfully installed' in mech: print 'Installed mechanize'
+        beaut = subprocess.check_output(['/usr/local/bin/pip', 'install', 'bs4'])
+        if 'successfully installed' in beaut: print 'Installed beautifulsoup'
+        scapy = subprocess.check_output(['/usr/local/bin/pip', 'install', 'scapy'])
+        if 'successfully installed' in beaut: print 'Installed scapy'
+    except:
+        raise MissingPipException('Could not find pip.')
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 def send(IP, port, message, keepalive = False):
@@ -707,3 +719,6 @@ if __name__ == '__main__':
 
 class MissingPackageException(Exception):
     '''Raise when 3rd party modules are not able to be imported.'''
+
+class MissingPipexception(Exception):
+    '''Raise when pip is not able to be found'''
