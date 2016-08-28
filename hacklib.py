@@ -19,11 +19,11 @@ CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFT
 OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.'''
 
 import socket, httplib, threading, time, urllib2, os
+import logging
 from Queue import Queue
+logging.getLogger("scapy.runtime").setLevel(logging.ERROR) # Fixes scapy logging error
 try: from scapy.all import *
 except: raise MissingPackageException('Please install scapy to continue.')
-import logging
-logging.getLogger("scapy.runtime").setLevel(logging.ERROR) # Fixes scapy logging error
 from string import ascii_uppercase, ascii_lowercase, digits # Import for PatternCreate and PatternOffset
 
 class Backdoor(object):
@@ -843,10 +843,10 @@ class Mangle:
 
     def __init__(self, text, num1, num2, year1, year2):
 
-        self.num1 = num1
-        self.num2 = num2
-        self.year1 = year1
-        self.year2 = year2
+        self.num1 = num1 
+        self.num2 = num2 + 1
+        self.year1 = year1 
+        self.year2 = year2 + 1
         self.text = text
 
 
@@ -925,14 +925,14 @@ class Mangle:
     def Leet(self):
 
         for x in self.text.split():
-            print x.replace("e", "3").replace("i", "1").replace("O", "0").replace("I", "1").replace("E", "3").replace("o", "0").replace("l", "1").replace("L", "1").replace("g", "9").replace("G", "6").replace("b", "8").replace("B", "8")
+            print x.replace("e", "3").replace("i", "1").replace("O", "0").replace("I", "1").replace("E", "3").replace("o", "0").replace("l", "1").replace("L", "1").replace("g", "9").replace("G", "6").replace("b", "8").replace("B", "8").replace("s", "$").replace("S", "$")
 
 
 
     def LeetCap(self):
 
         for x in self.text.split():
-            print x.capitalize().replace("e", "3").replace("i", "1").replace("O", "0").replace("I", "1").replace("E", "3").replace("o", "0").replace("l", "1").replace("L", "1").replace("g", "9").replace("G", "6").replace("b", "8").replace("B", "8")
+            print x.capitalize().replace("e", "3").replace("i", "1").replace("O", "0").replace("I", "1").replace("E", "3").replace("o", "0").replace("l", "1").replace("L", "1").replace("g", "9").replace("G", "6").replace("b", "8").replace("B", "8").replace("s", "$").replace("S", "$")
 
 
 
@@ -942,8 +942,8 @@ class Mangle:
 
             for i in range(self.year1, self.year2):
 
-                print ("%s" + "%s") % (x.replace("e", "3").replace("i", "1").replace("O", "0").replace("I", "1").replace("E", "3").replace("o", "0").replace("l", "1").replace("L", "1").replace("g", "9").replace("G", "6").replace("b", "8").replace("B", "8"), i)
-                print ("%s" + "%s") % (i, x.replace("e", "3").replace("i", "1").replace("O", "0").replace("I", "1").replace("E", "3").replace("o", "0").replace("l", "1").replace("L", "1").replace("g", "9").replace("G", "6").replace("b", "8").replace("B", "8"))
+                print ("%s" + "%s") % (x.replace("e", "3").replace("i", "1").replace("O", "0").replace("I", "1").replace("E", "3").replace("o", "0").replace("l", "1").replace("L", "1").replace("g", "9").replace("G", "6").replace("b", "8").replace("B", "8").replace("s", "$").replace("S", "$"), i)
+                print ("%s" + "%s") % (i, x.replace("e", "3").replace("i", "1").replace("O", "0").replace("I", "1").replace("E", "3").replace("o", "0").replace("l", "1").replace("L", "1").replace("g", "9").replace("G", "6").replace("b", "8").replace("B", "8").replace("s", "$").replace("S", "$"))
 
 
     def LeetNumbers(self):
@@ -952,15 +952,15 @@ class Mangle:
 
             for i in range(self.num1, self.num2):
 
-                print ("%s" + "%s") % (x.replace("e", "3").replace("i", "1").replace("O", "0").replace("I", "1").replace("E", "3").replace("o", "0").replace("l", "1").replace("L", "1").replace("g", "9").replace("G", "6").replace("b", "8").replace("B", "8"), i)
-                print ("%s" + "%s") % (i, x.replace("e", "3").replace("i", "1").replace("O", "0").replace("I", "1").replace("E", "3").replace("o", "0").replace("l", "1").replace("L", "1").replace("g", "9").replace("G", "6").replace("b", "8").replace("B", "8"))
+                print ("%s" + "%s") % (x.replace("e", "3").replace("i", "1").replace("O", "0").replace("I", "1").replace("E", "3").replace("o", "0").replace("l", "1").replace("L", "1").replace("g", "9").replace("G", "6").replace("b", "8").replace("B", "8").replace("s", "$").replace("S", "$"), i)
+                print ("%s" + "%s") % (i, x.replace("e", "3").replace("i", "1").replace("O", "0").replace("I", "1").replace("E", "3").replace("o", "0").replace("l", "1").replace("L", "1").replace("g", "9").replace("G", "6").replace("b", "8").replace("B", "8").replace("s", "$").replace("S", "$"))
 
 
     def UniqueLeet(self):
 
         for x in self.text.split():
 
-            print ("%s" + "%s") % (x.replace("e", "3").replace("i", "1").replace("O", "0").replace("I", "1").replace("E", "3").replace("o", "0").replace("l", "1").replace("L", "1").replace("g", "9").replace("G", "6").replace("b", "8").replace("B", "8"),(x.replace("e", "3").replace("i", "1").replace("O", "0").replace("I", "1").replace("E", "3").replace("o", "0").replace("l", "1").replace("L", "1").replace("g", "9").replace("G", "6").replace("b", "8").replace("B", "8")))
+            print ("%s" + "%s") % (x.replace("e", "3").replace("i", "1").replace("O", "0").replace("I", "1").replace("E", "3").replace("o", "0").replace("l", "1").replace("L", "1").replace("g", "9").replace("G", "6").replace("b", "8").replace("B", "8"),(x.replace("e", "3").replace("i", "1").replace("O", "0").replace("I", "1").replace("E", "3").replace("o", "0").replace("l", "1").replace("L", "1").replace("g", "9").replace("G", "6").replace("b", "8").replace("B", "8").replace("s", "$").replace("S", "$")))
 
 
 
@@ -1004,6 +1004,7 @@ class Mangle:
         for x in self.text.split():
 
             print x[::-1] + x[::-1]
+
 
 '''
 This Classes Dectects Probe Requests from Wireless Devices.
