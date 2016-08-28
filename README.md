@@ -176,3 +176,62 @@ u'KE'
 # To filter proxies by country and type:
 # proxylist = hacklib.getProxies(country_filter = ('RU', 'CA', 'SE'), proxy_type='Socks5')
 ```
+-
+Word Mangling:
+
+```python
+from hacklib import *
+
+word = Mangle("Test", 0, 10, 1990, 2016)
+
+word.Leet()
+word.Numbers()
+word.Years()
+```
+Output:
+
+```
+T3$t
+Test0
+0Test
+...snip...
+Test10
+10Test
+Test1990
+1990Test
+...snip...
+Test2016
+2016Test
+```
+-
+
+Pattern Create:
+
+```python
+from hacklib import *
+
+Pattern = PatternCreate(100)
+
+Pattern.generate()
+```
+Output:
+
+```
+Aa0Aa1Aa2Aa3Aa4Aa5Aa6Aa7Aa8Aa9Ab0Ab1Ab2Ab3Ab4Ab5Ab6Ab7Ab8Ab9Ac0Ac1Ac2Ac3Ac4Ac5Ac6Ac7Ac8Ac9Ad0Ad1Ad2A
+```
+-
+
+Pattern Offset:
+
+```python
+from hacklib import *
+
+Offset = PatternOffset("6Ab7")
+
+Offset.find()
+```
+Output:
+
+```python
+[+] Offset: 50
+```
