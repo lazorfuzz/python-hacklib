@@ -20,6 +20,10 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.'''
 
 import socket, httplib, threading, time, urllib2, os
 from Queue import Queue
+import logging
+logging.getLogger("scapy.runtime").setLevel(logging.ERROR) # Fixes scapy logging error
+from scapy.all import * # Required for the Probe Request Class
+from string import ascii_uppercase, ascii_lowercase, digits # Import for PatternCreate and PatternOffset
 
 class FTPAuth(object):
     '''FTP login and command handler.
@@ -701,6 +705,325 @@ def userInterface():
                 print 'Proxy connected.'
                 time.sleep(2)
                 pass
+"""
+
+This Class Mangles Words specified by the user
+
+Example:
+
+Test = hacklib.Mangle("Test", 1, 10, 1996, 2016)
+
+Test.Leet()
+
+Output: T3st
+
+"""
+
+class Mangle:
+
+    def __init__(self, text, num1, num2, year1, year2):
+
+        self.num1 = num1
+        self.num2 = num2
+        self.year1 = year1
+        self.year2 = year2
+        self.text = text
+
+
+    def Numbers(self):
+
+        for x in self.text.split():
+
+            for i in range(self.num1, self.num2):
+                
+                print ("%s" + "%s") % (x, i)
+                print ("%s" + "%s") % (i, x)
+
+    def Years(self):
+
+        for x in self.text.split():
+
+            for i in range(self.year1, self.year2):
+                
+                print ("%s" + "%s") % (x, i)
+                print ("%s" + "%s") % (i, x)
+
+
+    def UniqueNum(self):
+        
+        for x in self.text.split():
+              
+            for i in range(self.num1, self.num2):
+
+                print ("%s" + "%s" + "%s") % (x, x, i)
+
+
+    def UniqueYears(self):
+
+        for x in self.text.split():
+              
+            for i in range(self.year1, self.year2):
+
+                print ("%s" + "%s" + "%s") % (x, x, i)
+
+
+
+    def FirstLetterCapNum(self):
+
+        for x in self.text.split():
+
+            for i in range(self.num1, self.num2):
+                
+                print ("%s" + "%s") % (x.capitalize(), i)
+                print ("%s" + "%s") % (i, x.capitalize())
+
+    def Caps(self):
+
+        for x in self.text.split():
+
+            print x.capitalize()
+
+
+    def UniqueCaps(self):
+
+        for x in self.text.split():
+
+            print ("%s" + "s") % (x.capitalize(), x.capitalize())
+        
+
+
+    def CapandYears(self):
+
+        for x in self.text.split():
+
+            for i in range(self.year1, self.year2):
+                
+                print ("%s" + "%s") % (x.capitalize(), i)
+                print ("%s" + "%s") % (i, x.capitalize())
+            
+        
+    def Leet(self):
+
+        for x in self.text.split():
+            print x.replace("e", "3").replace("i", "1").replace("O", "0").replace("I", "1").replace("E", "3").replace("o", "0").replace("l", "1").replace("L", "1").replace("g", "9").replace("G", "6").replace("b", "8").replace("B", "8")
+
+
+
+    def LeetCap(self):
+
+        for x in self.text.split():
+            print x.capitalize().replace("e", "3").replace("i", "1").replace("O", "0").replace("I", "1").replace("E", "3").replace("o", "0").replace("l", "1").replace("L", "1").replace("g", "9").replace("G", "6").replace("b", "8").replace("B", "8")
+
+
+
+    def LeetYears(self):
+
+        for x in self.text.split():
+
+            for i in range(self.year1, self.year2):
+
+                print ("%s" + "%s") % (x.replace("e", "3").replace("i", "1").replace("O", "0").replace("I", "1").replace("E", "3").replace("o", "0").replace("l", "1").replace("L", "1").replace("g", "9").replace("G", "6").replace("b", "8").replace("B", "8"), i)
+                print ("%s" + "%s") % (i, x.replace("e", "3").replace("i", "1").replace("O", "0").replace("I", "1").replace("E", "3").replace("o", "0").replace("l", "1").replace("L", "1").replace("g", "9").replace("G", "6").replace("b", "8").replace("B", "8"))
+
+
+    def LeetNumbers(self):
+
+        for x in self.text.split():
+
+            for i in range(self.num1, self.num2):
+
+                print ("%s" + "%s") % (x.replace("e", "3").replace("i", "1").replace("O", "0").replace("I", "1").replace("E", "3").replace("o", "0").replace("l", "1").replace("L", "1").replace("g", "9").replace("G", "6").replace("b", "8").replace("B", "8"), i)
+                print ("%s" + "%s") % (i, x.replace("e", "3").replace("i", "1").replace("O", "0").replace("I", "1").replace("E", "3").replace("o", "0").replace("l", "1").replace("L", "1").replace("g", "9").replace("G", "6").replace("b", "8").replace("B", "8"))
+
+
+    def UniqueLeet(self):
+
+        for x in self.text.split():
+
+            print ("%s" + "%s") % (x.replace("e", "3").replace("i", "1").replace("O", "0").replace("I", "1").replace("E", "3").replace("o", "0").replace("l", "1").replace("L", "1").replace("g", "9").replace("G", "6").replace("b", "8").replace("B", "8"),(x.replace("e", "3").replace("i", "1").replace("O", "0").replace("I", "1").replace("E", "3").replace("o", "0").replace("l", "1").replace("L", "1").replace("g", "9").replace("G", "6").replace("b", "8").replace("B", "8")))
+
+
+
+    def Reverse(self):
+
+        for x in self.text.split():
+
+            print x[::-1]
+
+
+    def ReverseCap(self):
+
+        for x in self.text.split():
+            print x[::-1].capitalize()
+
+
+
+    def ReverseNum(self):
+
+        for x in self.text.split():
+
+            for i in range(self.num1, self.num2):
+
+                print ("%s" + "%s") % (x[::-1], i)
+                print ("%s" + "%s") % (i, x[::-1])
+
+
+
+    def ReverseYears(self):
+
+        for x in self.text.split():
+
+            for i in range(self.year1, self.year2):
+
+                print ("%s" + "%s") % (x[::-1], i)
+                print ("%s" + "%s") % (i, x[::-1])
+
+
+    def ReverseUnique(self):
+
+        for x in self.text.split():
+
+            print x[::-1] + x[::-1]
+
+'''
+This Classes Dectects Probe Requests from Wireless Devices.
+
+Example: 
+
+Probe = Proberequests("wlan0")
+
+Probe.startSniff()
+
+'''
+
+class Proberequests:
+
+    global probeReqs
+
+    probeReqs = []
+
+    def __init__(self, interface):
+
+        self.interface = interface
+
+    def sniffProbe(self, p):
+
+        if p.haslayer(Dot11ProbeReq):
+            netName = p.getlayer(Dot11ProbeReq).info
+            if netName not in probeReqs:
+                probeReqs.append(netName)
+                print '[!] Detected New Probe Request: '
+                print "[+] ESSID: " + netName + " BSSID: " + p.addr2
+
+    def startSniff(self):
+
+        print "[+] Scanning...\n"
+
+        sniff(iface=self.interface, prn=self.sniffProbe)
+
+"""
+
+This class creates a unique pattern of 20280 characters. 
+
+This is a replica of the metasploit tool called pattern_create.rb
+
+Example:
+
+patternTest = PatternCreate(1000)
+
+patternTest.generate()
+
+Creates a unique pattern of 1000 characters.
+
+"""
+
+class PatternCreate:
+
+    global MAX_PATTERN_LENGTH 
+
+    MAX_PATTERN_LENGTH = 20280
+
+    def __init__(self, length):
+
+        self.length = length
+
+    def generate(self):
+
+        output = []
+
+        """
+        Generate a pattern of a given length up to a maximum
+        of 20280 - after this the pattern would repeat
+        """
+        if self.length >= MAX_PATTERN_LENGTH:
+            raise MaxLengthException('ERROR: Pattern length exceeds maximum of %d' % MAX_PATTERN_LENGTH)
+
+        pattern = ''
+        for upper in ascii_uppercase:
+            for lower in ascii_lowercase:
+                for digit in digits:
+                    if len(pattern) < self.length:
+                        pattern += upper+lower+digit
+                    else:
+                        out = pattern[:self.length]
+
+        output.append(out)
+
+        print str(output)[1:-1].replace("'", "")
+
+
+"""
+
+This class finds the offset from the PatternCreate class.
+
+This is a replica of the metasploit tool called pattern_offset.rb
+
+Example:
+
+offset = PatternOffset("Aw1A")
+
+offset.find()
+
+Finds offset of Aw1A.
+
+Output: [+] Offset: 663
+
+"""
+
+
+class PatternOffset:
+
+    def __init__(self, search_pattern):
+
+        self.search_pattern = search_pattern
+
+    def find(self):
+
+        offset = []
+
+        needle = self.search_pattern
+
+        try:
+            if needle.startswith('0x'):
+                # Strip off '0x', convert to ASCII and reverse
+                needle = needle[2:]
+                needle = bytes.fromhex(needle).decode('ascii')
+                needle = needle[::-1]
+        except TypeError as e:
+            print('Unable to convert hex input:', e)
+            sys.exit(1)
+
+        haystack = ''
+        for upper in ascii_uppercase:
+            for lower in ascii_lowercase:
+                for digit in digits:
+                    haystack += upper+lower+digit
+                    found_at = haystack.find(needle)
+                    if found_at > -1:
+
+                        offset = found_at
+
+        print "[+] Offset: " + str(offset)
 
 if __name__ == '__main__':
     userInterface()
