@@ -20,9 +20,10 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.'''
 
 import socket, httplib, threading, time, urllib2, os
 from Queue import Queue
+try: from scapy.all import *
+except: raise MissingPackageException('Please install scapy to continue.')
 import logging
 logging.getLogger("scapy.runtime").setLevel(logging.ERROR) # Fixes scapy logging error
-from scapy.all import * # Required for the Probe Request Class
 from string import ascii_uppercase, ascii_lowercase, digits # Import for PatternCreate and PatternOffset
 
 class Backdoor(object):
@@ -563,15 +564,14 @@ def getProxies(country_filter = 'ALL', proxy_type = ('Socks4', 'Socks5')):
 
 def installDependencies():
     import subprocess
-    try:
-        mech = subprocess.check_output(['/usr/local/bin/pip', 'install', 'mechanize'])
-        if 'successfully installed' in mech: print 'Installed mechanize'
-        beaut = subprocess.check_output(['/usr/local/bin/pip', 'install', 'bs4'])
-        if 'successfully installed' in beaut: print 'Installed beautifulsoup'
-        scapy = subprocess.check_output(['/usr/local/bin/pip', 'install', 'scapy'])
-        if 'successfully installed' in beaut: print 'Installed scapy'
-    except:
-        raise MissingPipException('Could not find pip.')
+    mech = subprocess.check_output(['/usr/local/bin/pip', 'install', 'mechanize'])
+    if 'successfully installed' in mech: print 'Installed mechanize'
+    beaut = subprocess.check_output(['/usr/local/bin/pip', 'install', 'bs4'])
+    if 'successfully installed' in beaut: print 'Installed beautifulsoup'
+    scapy = subprocess.check_output(['/usr/local/bin/pip', 'install', 'scapy'])
+    if 'successfully installed' in scapy: print 'Installed scapy'
+    pcapy = subprocess.check_output(['/usr/local/bin/pip', 'install', 'pcapy'])
+    if 'successfully installed' in pcapy: print 'Installed pcapy'
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 def send(IP, port, message, keepalive = False):
@@ -1110,10 +1110,11 @@ Output: [+] Offset: 663
 
 """
 
-
 class PatternOffset:
 
     def __init__(self, search_pattern):
+        
+
 
         self.search_pattern = search_pattern
 
