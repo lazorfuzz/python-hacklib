@@ -118,17 +118,25 @@ class FTPAuth(object):
         self.username = ''
         self.password = ''
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.s.settimeout(3)
+        self.s.settimeout(5)
         self.s.connect((self.IP, self.port))
         self.s.recv(1024)
 
-    def send(self, message):
+    def _send(self, message):
         self.s.send(message)
-        return self.s.recv(2048)
+        response = self.s.recv(32768)
+        return response
+
+    def send(self, message):
+        self.s.send(message + '\r\n')
+        while True:
+            response = self.s.recv(32768)
+            if response:
+                return response
 
     def login(self, username, password):
-        self.send('USER ' + username + '\r\n')
-        response = self.send('PASS ' + password + '\r\n')
+        self._send('USER ' + username + '\r\n')
+        response = self._send('PASS ' + password + '\r\n')
         if '230' in response:
             return
         elif '331' in response:
@@ -269,7 +277,7 @@ class DOSer(object):
         self.time_length = duration
         if payload != 'default': self.payload = payload
         # Creates queue to hold each thread
-        self.q = Queue()
+        self.q = Queue.Queue()
         #print '> Launching ' + str(threads) + ' threads for ' + str(duration) + ' seconds.'
         for i in range(threads):
             t = threading.Thread(target=self._threader)
@@ -352,7 +360,7 @@ Accept-Encoding: gzip, deflate''' + '\r\n\r\n'
         self.port_range = port_range
         self.timeout = 1
         # Creates queue to hold each thread
-        self.q = Queue()
+        self.q = Queue.Queue()
         for x in range(30):
             t = threading.Thread(target=self._threader)
             t.daemon = True
@@ -403,7 +411,7 @@ class LanScanner(object):
         # Adds list of possible local hosts to self.range_range
         for i in range(h_range[0], h_range[1]):
             self.host_range.append(stub + '.' + str(i))
-        self.q = Queue()
+        self.q = Queue.Queue()
         # Launches 100 threads to ping 254 potential hosts
         for x in range(100):
             t = threading.Thread(target=self._threader)
@@ -520,6 +528,10 @@ def importFromString(code, name):
 
 def getIP(host):
     return socket.gethostbyname(host)
+
+def randomIP():
+    import struct
+    return socket.inet_ntoa(struct.pack('>I', random.randint(1, 0xffffffff)))
 
 def getProxies(country_filter = 'ALL', proxy_type = ('Socks4', 'Socks5')):
     '''Gets list of recently tested Socks4/5 proxies.
