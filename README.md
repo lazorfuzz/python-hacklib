@@ -10,6 +10,8 @@ To get hacklib, simply run in command line:
 ```console
 pip install hacklib
 ```
+
+-
 hacklib also has a user interface. To use it, you can do one of the following:
 
 Download hacklib.py and run in console:
@@ -36,12 +38,7 @@ import hacklib
 hacklib.userInterface()
 ```
 -
-#### Dependencies
-Not all classes have external dependencies, but just in case you can do the following:
-```python
-hacklib.installDependencies()
-```
--
+
 #### Usage Examples
 Reverse shell backdooring (Currently only for Macs):
 ```python
@@ -233,3 +230,13 @@ Output:
 ```python
 [+] Offset: 50
 ```
+-
+#### Dependencies
+Not all classes have external dependencies, but just in case you can do the following:
+```python
+hacklib.installDependencies()
+```
+
+-
+Note: hacklib is in active development. Expect crucial/major updates frequently. Always update your version of hacklib via pip when you get the chance.
+
