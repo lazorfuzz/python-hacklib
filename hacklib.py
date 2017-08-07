@@ -596,7 +596,7 @@ def send(IP, port, message, keepalive = False):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.connect((IP, port))
     sock.send(message)
-    response = sock.recv(2048)
+    response = sock.recv(2400000)
     if not keepalive:
         sock.close()
     return response
