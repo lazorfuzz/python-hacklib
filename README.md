@@ -4,14 +4,14 @@
 ##### Toolkit for hacking enthusiasts using Python.
 hacklib is a Python module for hacking enthusiasts interested in network security. It is currently in active development.
 
--
+
 #### Installation
 To get hacklib, simply run in command line:
 ```console
 pip install hacklib
 ```
 
--
+
 hacklib also has a user interface. To use it, you can do one of the following:
 
 Download hacklib.py and run in console:
@@ -37,7 +37,7 @@ Or if you got it using pip:
 import hacklib
 hacklib.userInterface()
 ```
--
+
 
 #### Usage Examples
 Reverse shell backdooring (Currently only for Macs):
@@ -64,7 +64,7 @@ bash$ whoami # Type a command
 leon
 bash$ # Nice!
 ```
--
+
 Universal login client for almost all HTTP/HTTPS form-based logins and HTTP Basic Authentication logins:
 
 ```python
@@ -97,7 +97,7 @@ for p in passwords:
         print 'Password is', p
         break
 ```
--
+
 Port Scanning:
 ```python
 from hacklib import *
@@ -139,7 +139,7 @@ Cookie: C107351277=BBBBBBBBBBBBBBBBBBBB\x00''' + '\r\n\r\n'
 # The cookie replaced the firmware's memory allocation for web authentication with a null bye.
 # The router's admin page is now fully accessible from any web browser.
 ```
--
+
 FTP authentication:
 ```python
 import hacklib
@@ -149,7 +149,7 @@ try:
 except:
     print 'Login failed.'
 ```
--
+
 Socks4/5 proxy scraping and tunneling
 ```python
 >>> import hacklib
@@ -171,7 +171,7 @@ u'KE'
 # To filter proxies by country and type:
 # proxylist = hacklib.getProxies(country_filter = ('RU', 'CA', 'SE'), proxy_type='Socks5')
 ```
--
+
 Word Mangling:
 
 ```python
@@ -198,7 +198,6 @@ Test1990
 Test2016
 2016Test
 ```
--
 
 Pattern Create:
 
@@ -214,7 +213,6 @@ Output:
 ```
 Aa0Aa1Aa2Aa3Aa4Aa5Aa6Aa7Aa8Aa9Ab0Ab1Ab2Ab3Ab4Ab5Ab6Ab7Ab8Ab9Ac0Ac1Ac2Ac3Ac4Ac5Ac6Ac7Ac8Ac9Ad0Ad1Ad2A
 ```
--
 
 Pattern Offset:
 
@@ -230,13 +228,10 @@ Output:
 ```python
 [+] Offset: 50
 ```
--
+
 #### Dependencies
 Not all classes have external dependencies, but just in case you can do the following:
 ```python
 hacklib.installDependencies()
 ```
-
--
-Note: hacklib is in active development. Expect crucial/major updates frequently. Always update your version of hacklib via pip when you get the chance.
 
