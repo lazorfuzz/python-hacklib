@@ -2,7 +2,7 @@
 ![MIT License](https://img.shields.io/github/license/mashape/apistatus.svg)
 [![Python 2.6|2.7](https://img.shields.io/badge/python-2.6|2.7-yellow.svg)](https://www.python.org/)
 ##### Toolkit for hacking enthusiasts using Python.
-hacklib is a Python module for hacking enthusiasts interested in network security. It is currently in active development.
+hacklib is a Python module for hacking enthusiasts interested in network security. It is no longer in active development.
 
 
 #### Installation
